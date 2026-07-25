@@ -53,31 +53,36 @@ has nothing meaningful to translate.
 ## Repo layout
 
 ```
-src/                  All pipeline code, shared between the word and char runs
-                       (a --token_type flag selects word vs char throughout,
-                       rather than maintaining two copies of the codebase)
-  dataset.py           Vocabulary building, tokenization, DataLoader/Sampler
-  models.py            Encoder / Decoder (Luong & Bahdanau attention) / Seq2Seq
-  train.py             Single-experiment training entry point (DDP-aware)
-  evaluate.py          BLEU/METEOR scoring, attention visualization, reporting
-  embeddings.py        Pretrained GloVe / word2vec-style embedding loading
-  preprocess.py        Europarl download, sampling, train/val/test splitting
-  run_studies.py       Master orchestrator - runs all 5 studies + tuning stages
-  pivot.py             DE->EN->SV pivot chain translator + quantitative eval
-  build_pivot_eval_set.py  Builds an aligned DE/EN/SV pivot evaluation set
-  explore_data.py      Task 1 corpus exploration (vocab size, length stats)
-  visualize_attention.py / visualize_pivot.py / viz_style.py
-                        Print-quality attention heatmap figures for the report
-  config.py, utils.py, auto_shutdown.py   Shared config/logging/cache helpers
-notebooks/             RunPod bootstrap scripts actually used to run training
-                       on a rented GPU (see their own header comments)
-config/config.yaml     Default hyperparameter profiles
-results/word/, results/char/   Every best_config_*.json / *.csv / *.png / *.log
-                       artifact produced by the real training runs
-results/eda/           Task 1 data-exploration output
-report/figures/        Final print-quality figures used in the write-up
-bench.py               Standalone training-step throughput/VRAM microbenchmark
+src/            All pipeline code, shared between the word and char runs
+notebooks/      RunPod bootstrap scripts used to launch real training runs
+config/         Default hyperparameter profiles
+results/        Every artifact (json/csv/png/log) from the real training runs
+report/figures/ Final print-quality figures used in the write-up
+bench.py        Standalone training-step throughput/VRAM microbenchmark
 ```
+
+`src/` is shared between both pipelines — a `--token_type` flag selects
+word vs. char throughout, rather than maintaining two copies of the
+codebase:
+
+| File | Purpose |
+|---|---|
+| `dataset.py` | Vocabulary building, tokenization, DataLoader/Sampler |
+| `models.py` | Encoder / Decoder (Luong & Bahdanau attention) / Seq2Seq |
+| `train.py` | Single-experiment training entry point (DDP-aware) |
+| `evaluate.py` | BLEU/METEOR scoring, attention visualization, reporting |
+| `embeddings.py` | Pretrained GloVe / word2vec-style embedding loading |
+| `preprocess.py` | Europarl download, sampling, train/val/test splitting |
+| `run_studies.py` | Master orchestrator - runs all 5 studies + tuning stages |
+| `pivot.py` | DE→EN→SV pivot chain translator + quantitative eval |
+| `build_pivot_eval_set.py` | Builds an aligned DE/EN/SV pivot evaluation set |
+| `explore_data.py` | Task 1 corpus exploration (vocab size, length stats) |
+| `visualize_attention.py`, `visualize_pivot.py`, `viz_style.py` | Print-quality attention heatmap figures for the report |
+| `config.py`, `utils.py`, `auto_shutdown.py` | Shared config/logging/cache helpers |
+
+`results/word/` and `results/char/` hold every `best_config_*.json` /
+`*.csv` / `*.png` / `*.log` artifact produced by the real training runs;
+`results/eda/` is the Task 1 data-exploration output.
 
 ## Running it yourself
 
