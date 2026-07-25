@@ -1,0 +1,37 @@
+{
+    "WORD_E1": {
+        "rnn_type": "RNN",
+        "bidirectional": true,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "bahdanau",
+        "train_time": "332.2s",
+        "inference_time": "1.5ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 10.744400749359873,
+            "mean_meteor": 0.335774346800592
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3480,
+                "bleu": 18.23,
+                "meteor": 0.4361
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 9951,
+                "bleu": 13.69,
+                "meteor": 0.3726
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 9925,
+                "bleu": 11.21,
+                "meteor": 0.3261
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9670,
+                "bleu": 8.68,
+                "meteor": 0.2717
+            }
+        }
+    }
+}

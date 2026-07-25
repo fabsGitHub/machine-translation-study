@@ -1,0 +1,36 @@
+# Machine-local settings for this RunPod instance (RTX 3090, 24GB VRAM, Ampere,
+# ~27-core CPU quota, ~116GB RAM quota - nproc/free report the HOST's raw 256
+# cores/1TB RAM inside this container; the real cgroup-enforced quota, checked via
+# /sys/fs/cgroup/cpu.max and memory.max, is ~27 cores / ~116GB).
+# Not committed to git - machine-local, keeps this from clobbering the GTX1070's
+# own tuned values in config/config.yaml there.
+#
+# batch_size_word=256: empirically validated via bench.py across BOTH the typical
+# config (hidden_dim=512, no attention: 1782 seq/s, 8.3GB) AND the worst-case
+# config in the Study A-E sweep (hidden_dim=1024, bidirectional, bahdanau
+# attention: 517 seq/s, 14.7GB, +24% over batch=128). 384 OOMs on the worst case,
+# so 256 leaves a real ~9GB safety margin.
+#
+# batch_size_char=16: char-level sequences are ~5x longer than word-level
+# (max_len 250 vs 50), which makes attention's per-step memory MUCH more
+# expensive. The SAME worst-case config (hidden_dim=1024, bidirectional,
+# bahdanau) OOMs at batch=64 and even batch=32 leaves only ~3.5GB margin
+# (19.98GB used) - 16 is the first value with genuine safety margin (16.6GB,
+# ~7GB free). This is much smaller than smaller char configs could actually
+# support, but run_studies.py's get_batch_size() applies ONE value to the whole
+# sweep regardless of hidden_dim, so this has to be sized for the worst case.
+# RECOMMENDATION: use --grad_accum_steps (already supported in train.py/run_cmd)
+# to reach a larger effective batch size for char-level runs without raising
+# the per-step batch past what fits - e.g. batch_size_char=16 with
+# grad_accum_steps=8 gives an effective batch of 128 at bounded peak VRAM.
+training:
+  batch_size_word: 256
+  batch_size_char: 16
+
+data:
+  # os.cpu_count() reports 256 here (misleading - see note above), so
+  # src/dataset.py's auto-scaling formula would cap at 12 regardless.
+  # Given the real ~27-core quota, explicitly raising this a bit is reasonable,
+  # but worker-count gains were small (~5-10%) in testing - not confirmed to
+  # matter more here specifically, just a reasonable starting point.
+  num_workers: 16

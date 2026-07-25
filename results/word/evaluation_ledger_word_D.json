@@ -1,0 +1,72 @@
+{
+    "WORD_D1": {
+        "rnn_type": "RNN",
+        "bidirectional": true,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "bahdanau",
+        "train_time": "355.3s",
+        "inference_time": "1.6ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 7.427933972947315,
+            "mean_meteor": 0.28256710371636246
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3390,
+                "bleu": 13.19,
+                "meteor": 0.3727
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10460,
+                "bleu": 9.76,
+                "meteor": 0.3132
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 10165,
+                "bleu": 8.06,
+                "meteor": 0.2781
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9796,
+                "bleu": 5.69,
+                "meteor": 0.2232
+            }
+        }
+    },
+    "WORD_D2": {
+        "rnn_type": "RNN",
+        "bidirectional": true,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "bahdanau",
+        "train_time": "302.4s",
+        "inference_time": "1.5ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 10.864227201777792,
+            "mean_meteor": 0.32706604197457545
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 4107,
+                "bleu": 14.81,
+                "meteor": 0.4006
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10993,
+                "bleu": 12.82,
+                "meteor": 0.3551
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 9991,
+                "bleu": 10.93,
+                "meteor": 0.3176
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 8720,
+                "bleu": 9.2,
+                "meteor": 0.2679
+            }
+        }
+    }
+}

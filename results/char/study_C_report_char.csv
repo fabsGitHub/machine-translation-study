@@ -1,0 +1,7 @@
+Tokenization,Study ID,Architectural Variant,BLEU Score,Metric 2 (METEOR),Train Time,Inference Time
+Char-Level,Study C1,Uni-GRU (Embeds: scratch),0.01,0.07,7.6s,N/A
+Char-Level,Study C2,Uni-GRU (Embeds: scratch),0.01,0.07,7.6s,N/A
+Char-Level,Study C3,Uni-GRU (Embeds: scratch) w/ Luong Attn,0.00,0.06,16.9s,N/A
+Char-Level,Study C4,Uni-GRU (Embeds: scratch) w/ Bahdanau Attn,0.00,0.05,16.9s,N/A
+Char-Level,Study C5,Bi-RNN (Embeds: scratch) w/ Luong Attn,0.00,0.05,14.0s,N/A
+Char-Level,Study C6,Bi-RNN (Embeds: scratch) w/ Bahdanau Attn,0.00,0.05,16.1s,N/A

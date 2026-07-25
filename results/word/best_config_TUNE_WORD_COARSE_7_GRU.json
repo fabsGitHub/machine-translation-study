@@ -1,0 +1,42 @@
+{
+    "experiment": "TUNE_WORD_COARSE_7",
+    "rnn_type": "GRU",
+    "bidirectional": false,
+    "epochs": 4,
+    "lr": 0.0001,
+    "dropout": 0.2,
+    "emb_dim": 128,
+    "hidden_dim": 1024,
+    "batch_size": 256,
+    "grad_accum_steps": 4,
+    "clip": 1.0,
+    "tf_ratio": 0.5,
+    "attention_type": "none",
+    "token_type": "word",
+    "embedding_source": "scratch",
+    "freeze_emb": false,
+    "src_lang": "en",
+    "trg_lang": "de",
+    "resume": true,
+    "eval_max_samples": 1000,
+    "val_max_samples": null,
+    "train_time": "70.9s",
+    "best_val_loss": 6.652719830566982,
+    "val_loss": 6.652719830566982,
+    "epochs_trained": 4,
+    "loss_history": {
+        "train": [
+            7.259237174226456,
+            6.5907712453553655,
+            6.539139170606597,
+            6.5119335531186655
+        ],
+        "val": [
+            6.652719830566982,
+            6.698240226169802,
+            6.711788834265943,
+            6.735379434981436
+        ]
+    },
+    "completed": true
+}

@@ -1,0 +1,1294 @@
+📝 Logging initialized -> Dual-streaming outputs to terminal and: /workspace/machine-translation-char/data/results/run_studies.log
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 NMT PERFORMANCE INFRASTRUCTURE ORCHESTRATOR INITIALIZED
+════════════════════════════════════════════════════════════════════════════════
+
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 EXECUTING PIPELINE FOR TOKEN LEVEL: CHAR
+   Mode: ALL | Epoch Strategy: [Tune-coarse: 4 (12 trials), A: 8, B: 8, C: 10, Tune-fine: 5 (6 trials), D/E: 10] | GPUs: 1
+════════════════════════════════════════════════════════════════════════════════
+
+⚡ Running preprocessing routine (token_type=char, mock=False)...
+
+═══════════════════════════════════════════════════════════════════════════
+🔍 RUNNING HYPERPARAMETER TUNING (COARSE - CHAR | 4 Epochs)
+═══════════════════════════════════════════════════════════════════════════
+📋 Configured 12 coarse trials across cell types ['LSTM', 'GRU', 'RNN'].
+
+🧪 [Trial 1/12] -> LR=0.0005, Dropout=0.3, Emb=64, Hidden=512, Cell=LSTM, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_1 --rnn_type LSTM --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0005 --dropout 0.3 --emb_dim 64 --hidden_dim 512 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1157.80s | Avg/Epoch: 289.45s
+
+🧪 [Trial 2/12] -> LR=0.0003, Dropout=0.4, Emb=128, Hidden=256, Cell=LSTM, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_2 --rnn_type LSTM --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1181.94s | Avg/Epoch: 295.49s
+
+🧪 [Trial 3/12] -> LR=0.001, Dropout=0.2, Emb=32, Hidden=1024, Cell=LSTM, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_3 --rnn_type LSTM --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.001 --dropout 0.2 --emb_dim 32 --hidden_dim 1024 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1216.57s | Avg/Epoch: 304.14s
+
+🧪 [Trial 4/12] -> LR=0.0001, Dropout=0.3, Emb=64, Hidden=512, Cell=LSTM, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_4 --rnn_type LSTM --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0001 --dropout 0.3 --emb_dim 64 --hidden_dim 512 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1160.64s | Avg/Epoch: 290.16s
+
+🧪 [Trial 5/12] -> LR=0.0003, Dropout=0.3, Emb=64, Hidden=512, Cell=GRU, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_5 --rnn_type GRU --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0003 --dropout 0.3 --emb_dim 64 --hidden_dim 512 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1049.24s | Avg/Epoch: 262.31s
+
+🧪 [Trial 6/12] -> LR=0.0005, Dropout=0.4, Emb=128, Hidden=256, Cell=GRU, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_6 --rnn_type GRU --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0005 --dropout 0.4 --emb_dim 128 --hidden_dim 256 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1052.38s | Avg/Epoch: 263.09s
+
+🧪 [Trial 7/12] -> LR=0.0001, Dropout=0.2, Emb=32, Hidden=1024, Cell=GRU, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_7 --rnn_type GRU --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0001 --dropout 0.2 --emb_dim 32 --hidden_dim 1024 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1094.43s | Avg/Epoch: 273.61s
+
+🧪 [Trial 8/12] -> LR=0.001, Dropout=0.3, Emb=64, Hidden=512, Cell=GRU, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_8 --rnn_type GRU --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1073.08s | Avg/Epoch: 268.27s
+
+🧪 [Trial 9/12] -> LR=0.0005, Dropout=0.2, Emb=64, Hidden=256, Cell=RNN, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_9 --rnn_type RNN --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 256 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 803.13s | Avg/Epoch: 200.78s
+
+🧪 [Trial 10/12] -> LR=0.0003, Dropout=0.3, Emb=128, Hidden=512, Cell=RNN, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_10 --rnn_type RNN --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0003 --dropout 0.3 --emb_dim 128 --hidden_dim 512 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 871.83s | Avg/Epoch: 217.96s
+
+🧪 [Trial 11/12] -> LR=0.0001, Dropout=0.4, Emb=32, Hidden=1024, Cell=RNN, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_11 --rnn_type RNN --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 896.19s | Avg/Epoch: 224.05s
+
+🧪 [Trial 12/12] -> LR=0.001, Dropout=0.2, Emb=64, Hidden=256, Cell=RNN, Attn=none, BiDir=False
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_COARSE_12 --rnn_type RNN --attention_type none --bidirectional False --embedding_source scratch --freeze_emb False --token_type char --lr 0.001 --dropout 0.2 --emb_dim 64 --hidden_dim 256 --batch_size 112 --epochs 4 --src_lang en --trg_lang de
+⏱️ Done. Duration: 793.56s | Avg/Epoch: 198.39s
+
+🏆 Best Tuning Parameters Saved -> /workspace/machine-translation-char/data/results/best_config_TUNE_CHAR_COARSE.json (Val Loss: 2.9771)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~6,520,206 parameters
+ └─ Model Memory Footprint:   ~24.87 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_A1 --rnn_type RNN --bidirectional False --token_type char --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1755.65s | Avg/Epoch: 219.46s
+
+⚡ [Async Eval Started] -> CHAR_A1 (RNN)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A2)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_A2 --rnn_type RNN --bidirectional True --token_type char --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_A1 (RNN)
+⏱️ Done. Duration: 1793.67s | Avg/Epoch: 224.21s
+
+⚡ [Async Eval Started] -> CHAR_A2 (RNN)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A3)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             GRU (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=512
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~5,019,278 parameters
+ └─ Model Memory Footprint:   ~19.15 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512 --experiment CHAR_A3 --rnn_type GRU --bidirectional False --token_type char --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_A2 (RNN)
+⏱️ Done. Duration: 2128.95s | Avg/Epoch: 266.12s
+
+⚡ [Async Eval Started] -> CHAR_A3 (GRU)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A4)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             GRU (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=512
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~9,055,886 parameters
+ └─ Model Memory Footprint:   ~34.55 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512 --experiment CHAR_A4 --rnn_type GRU --bidirectional True --token_type char --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_A3 (GRU)
+⏱️ Done. Duration: 2186.18s | Avg/Epoch: 273.27s
+
+⚡ [Async Eval Started] -> CHAR_A4 (GRU)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A5)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             LSTM (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=256
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~1,917,582 parameters
+ └─ Model Memory Footprint:   ~7.31 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256 --experiment CHAR_A5 --rnn_type LSTM --bidirectional False --token_type char --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_A4 (GRU)
+⏱️ Done. Duration: 2293.50s | Avg/Epoch: 286.69s
+
+⚡ [Async Eval Started] -> CHAR_A5 (LSTM)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A6)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             LSTM (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=256
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~3,363,470 parameters
+ └─ Model Memory Footprint:   ~12.83 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256 --experiment CHAR_A6 --rnn_type LSTM --bidirectional True --token_type char --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_A5 (LSTM)
+⏱️ Done. Duration: 2374.66s | Avg/Epoch: 296.83s
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+
+⚡ [Async Eval Started] -> CHAR_A6 (LSTM)
+✅ [Async Eval Finished] -> CHAR_A6 (LSTM)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B7)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_B7 --rnn_type RNN --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+⏱️ Done. Duration: 1802.00s | Avg/Epoch: 225.25s
+
+⚡ [Async Eval Started] -> CHAR_B7 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B8)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,907,726 parameters
+ └─ Model Memory Footprint:   ~45.42 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 64 --hidden_dim 1024 --experiment CHAR_B8 --rnn_type RNN --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_B7 (RNN)
+⏱️ Done. Duration: 1799.86s | Avg/Epoch: 224.98s
+
+⚡ [Async Eval Started] -> CHAR_B8 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B9)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~12,123,278 parameters
+ └─ Model Memory Footprint:   ~46.25 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 128 --hidden_dim 1024 --experiment CHAR_B9 --rnn_type RNN --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 8 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_B8 (RNN)
+⏱️ Done. Duration: 1792.79s | Avg/Epoch: 224.10s
+
+⚡ [Async Eval Started] -> CHAR_B9 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B10)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~12,123,278 parameters
+ └─ Model Memory Footprint:   ~46.25 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_B10 (RNN)
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+
+✅ [Async Eval Finished] -> CHAR_B9 (RNN)
+✅ [Async Eval Finished] -> CHAR_B10 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~6,520,206 parameters
+ └─ Model Memory Footprint:   ~24.87 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_C1 --rnn_type RNN --attention_type none --bidirectional False --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 10 --src_lang en --trg_lang de
+⏱️ Done. Duration: 2161.59s | Avg/Epoch: 216.16s
+
+⚡ [Async Eval Started] -> CHAR_C1 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C2)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_C2 --rnn_type RNN --attention_type none --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 10 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_C1 (RNN)
+⏱️ Done. Duration: 2230.99s | Avg/Epoch: 223.10s
+
+⚡ [Async Eval Started] -> CHAR_C2 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C3)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: luong)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~15,995,278 parameters
+ └─ Model Memory Footprint:   ~61.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_C3 --rnn_type RNN --attention_type luong --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 10 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_C2 (RNN)
+⏱️ Done. Duration: 5512.43s | Avg/Epoch: 551.24s
+
+⚡ [Async Eval Started] -> CHAR_C3 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C4)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_C4 --rnn_type RNN --attention_type bahdanau --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 10 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_C3 (RNN)
+⏱️ Done. Duration: 5487.38s | Avg/Epoch: 548.74s
+
+⚡ [Async Eval Started] -> CHAR_C4 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C5)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: luong)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~15,995,278 parameters
+ └─ Model Memory Footprint:   ~61.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_C5 --rnn_type RNN --attention_type luong --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 10 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_C4 (RNN)
+⏱️ Done. Duration: 5549.09s | Avg/Epoch: 554.91s
+
+⚡ [Async Eval Started] -> CHAR_C5 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C6)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_C6 --rnn_type RNN --attention_type bahdanau --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --batch_size 112 --epochs 10 --src_lang en --trg_lang de
+✅ [Async Eval Finished] -> CHAR_C5 (RNN)
+⏱️ Done. Duration: 5513.27s | Avg/Epoch: 551.33s
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+⚡ [Async Eval Started] -> CHAR_C6 (RNN)
+
+✅ [Async Eval Finished] -> CHAR_C6 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+
+═══════════════════════════════════════════════════════════════════════════
+🔍 RUNNING HYPERPARAMETER TUNING (FINE - CHAR | 5 Epochs)
+═══════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────
+🏆 [FINE TUNE CONFIGURATION - STUDY C WINNER]
+ ├─ Winner RNN Model:      RNN
+ ├─ Winner Attention:      bahdanau
+ ├─ Winner Bidirectional:  True
+ ├─ Winner Embedding Src:  scratch
+ └─ Winner Freeze Emb:     False
+───────────────────────────────────────────────────────────────────────────
+📋 Configured 6 fine-tuning trials for Study C Winner Architecture (RNN + bahdanau).
+
+🧪 [Trial 1/6] -> LR=0.0005, Dropout=0.2, Emb=64, Hidden=1024, Cell=RNN, Attn=bahdanau, BiDir=True
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_FINE_1 --rnn_type RNN --attention_type bahdanau --bidirectional True --embedding_source scratch --freeze_emb False --token_type char --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024 --batch_size 112 --epochs 5 --src_lang en --trg_lang de
+⏱️ Done. Duration: 2748.88s | Avg/Epoch: 549.78s
+
+🧪 [Trial 2/6] -> LR=0.0001, Dropout=0.3, Emb=32, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_FINE_2 --rnn_type RNN --attention_type bahdanau --bidirectional True --embedding_source scratch --freeze_emb False --token_type char --lr 0.0001 --dropout 0.3 --emb_dim 32 --hidden_dim 256 --batch_size 112 --epochs 5 --src_lang en --trg_lang de
+⏱️ Done. Duration: 2617.59s | Avg/Epoch: 523.52s
+
+🧪 [Trial 3/6] -> LR=0.0001, Dropout=0.2, Emb=32, Hidden=512, Cell=RNN, Attn=bahdanau, BiDir=True
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_FINE_3 --rnn_type RNN --attention_type bahdanau --bidirectional True --embedding_source scratch --freeze_emb False --token_type char --lr 0.0001 --dropout 0.2 --emb_dim 32 --hidden_dim 512 --batch_size 112 --epochs 5 --src_lang en --trg_lang de
+⏱️ Done. Duration: 2758.56s | Avg/Epoch: 551.71s
+
+🧪 [Trial 4/6] -> LR=0.0005, Dropout=0.3, Emb=32, Hidden=1024, Cell=RNN, Attn=bahdanau, BiDir=True
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_FINE_4 --rnn_type RNN --attention_type bahdanau --bidirectional True --embedding_source scratch --freeze_emb False --token_type char --lr 0.0005 --dropout 0.3 --emb_dim 32 --hidden_dim 1024 --batch_size 112 --epochs 5 --src_lang en --trg_lang de
+⏱️ Done. Duration: 2872.37s | Avg/Epoch: 574.47s
+
+🧪 [Trial 5/6] -> LR=0.001, Dropout=0.4, Emb=64, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_FINE_5 --rnn_type RNN --attention_type bahdanau --bidirectional True --embedding_source scratch --freeze_emb False --token_type char --lr 0.001 --dropout 0.4 --emb_dim 64 --hidden_dim 256 --batch_size 112 --epochs 5 --src_lang en --trg_lang de
+⏱️ Done. Duration: 2944.09s | Avg/Epoch: 588.82s
+
+🧪 [Trial 6/6] -> LR=0.0001, Dropout=0.3, Emb=128, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --experiment TUNE_CHAR_FINE_6 --rnn_type RNN --attention_type bahdanau --bidirectional True --embedding_source scratch --freeze_emb False --token_type char --lr 0.0001 --dropout 0.3 --emb_dim 128 --hidden_dim 256 --batch_size 112 --epochs 5 --src_lang en --trg_lang de
+⏱️ Done. Duration: 2734.15s | Avg/Epoch: 546.83s
+
+🏆 Best Tuning Parameters Saved -> /workspace/machine-translation-char/data/results/best_config_TUNE_CHAR_FINE.json (Val Loss: 2.9844)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study D (Language Direction Optimization) (CHAR_D1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0005 --dropout 0.2 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_D1 --rnn_type RNN --attention_type bahdanau --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --src_lang en --trg_lang de --batch_size 112 --epochs 10
+📝 Logging initialized -> Dual-streaming outputs to terminal and: /workspace/machine-translation-char/data/results/run_studies.log
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 NMT PERFORMANCE INFRASTRUCTURE ORCHESTRATOR INITIALIZED
+════════════════════════════════════════════════════════════════════════════════
+
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 EXECUTING PIPELINE FOR TOKEN LEVEL: CHAR
+   Mode: ALL | Epoch Strategy: [Tune-coarse: 4 (12 trials), A: 8, B: 8, C: 10, Tune-fine: 5 (6 trials), D/E: 10] | GPUs: 1
+════════════════════════════════════════════════════════════════════════════════
+
+⚡ Running preprocessing routine (token_type=char, mock=False)...
+
+═══════════════════════════════════════════════════════════════════════════
+🔍 RUNNING HYPERPARAMETER TUNING (COARSE - CHAR | 4 Epochs)
+═══════════════════════════════════════════════════════════════════════════
+📋 Configured 12 coarse trials across cell types ['LSTM', 'GRU', 'RNN'].
+
+🧪 [Trial 1/12] -> LR=0.0005, Dropout=0.3, Emb=64, Hidden=512, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 1 (TUNE_CHAR_COARSE_1) already completed. Skipping training.
+
+🧪 [Trial 2/12] -> LR=0.0003, Dropout=0.4, Emb=128, Hidden=256, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 2 (TUNE_CHAR_COARSE_2) already completed. Skipping training.
+
+🧪 [Trial 3/12] -> LR=0.001, Dropout=0.2, Emb=32, Hidden=1024, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 3 (TUNE_CHAR_COARSE_3) already completed. Skipping training.
+
+🧪 [Trial 4/12] -> LR=0.0001, Dropout=0.3, Emb=64, Hidden=512, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 4 (TUNE_CHAR_COARSE_4) already completed. Skipping training.
+
+🧪 [Trial 5/12] -> LR=0.0003, Dropout=0.3, Emb=64, Hidden=512, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 5 (TUNE_CHAR_COARSE_5) already completed. Skipping training.
+
+🧪 [Trial 6/12] -> LR=0.0005, Dropout=0.4, Emb=128, Hidden=256, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 6 (TUNE_CHAR_COARSE_6) already completed. Skipping training.
+
+🧪 [Trial 7/12] -> LR=0.0001, Dropout=0.2, Emb=32, Hidden=1024, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 7 (TUNE_CHAR_COARSE_7) already completed. Skipping training.
+
+🧪 [Trial 8/12] -> LR=0.001, Dropout=0.3, Emb=64, Hidden=512, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 8 (TUNE_CHAR_COARSE_8) already completed. Skipping training.
+
+🧪 [Trial 9/12] -> LR=0.0005, Dropout=0.2, Emb=64, Hidden=256, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 9 (TUNE_CHAR_COARSE_9) already completed. Skipping training.
+
+🧪 [Trial 10/12] -> LR=0.0003, Dropout=0.3, Emb=128, Hidden=512, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 10 (TUNE_CHAR_COARSE_10) already completed. Skipping training.
+
+🧪 [Trial 11/12] -> LR=0.0001, Dropout=0.4, Emb=32, Hidden=1024, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 11 (TUNE_CHAR_COARSE_11) already completed. Skipping training.
+
+🧪 [Trial 12/12] -> LR=0.001, Dropout=0.2, Emb=64, Hidden=256, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 12 (TUNE_CHAR_COARSE_12) already completed. Skipping training.
+
+🏆 Best Tuning Parameters Saved -> /workspace/machine-translation-char/data/results/best_config_TUNE_CHAR_COARSE.json (Val Loss: 2.9771)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~6,520,206 parameters
+ └─ Model Memory Footprint:   ~24.87 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_A1 (RNN)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A2)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_A2 (RNN)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A3)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             GRU (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=512
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~5,019,278 parameters
+ └─ Model Memory Footprint:   ~19.15 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A4)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             GRU (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=512
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~9,055,886 parameters
+ └─ Model Memory Footprint:   ~34.55 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A5)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             LSTM (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=256
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~1,917,582 parameters
+ └─ Model Memory Footprint:   ~7.31 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A6)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             LSTM (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=256
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~3,363,470 parameters
+ └─ Model Memory Footprint:   ~12.83 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+✅ [Async Eval Finished] -> CHAR_A1 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_A3 (GRU)
+✅ [Async Eval Finished] -> CHAR_A2 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_A4 (GRU)
+✅ [Async Eval Finished] -> CHAR_A3 (GRU)
+
+⚡ [Async Eval Started] -> CHAR_A5 (LSTM)
+✅ [Async Eval Finished] -> CHAR_A4 (GRU)
+
+⚡ [Async Eval Started] -> CHAR_A6 (LSTM)
+✅ [Async Eval Finished] -> CHAR_A5 (LSTM)
+✅ [Async Eval Finished] -> CHAR_A6 (LSTM)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B7)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_B7 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B8)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,907,726 parameters
+ └─ Model Memory Footprint:   ~45.42 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_B8 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B9)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~12,123,278 parameters
+ └─ Model Memory Footprint:   ~46.25 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B10)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~12,123,278 parameters
+ └─ Model Memory Footprint:   ~46.25 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+✅ [Async Eval Finished] -> CHAR_B7 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_B9 (RNN)
+✅ [Async Eval Finished] -> CHAR_B8 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_B10 (RNN)
+✅ [Async Eval Finished] -> CHAR_B9 (RNN)
+✅ [Async Eval Finished] -> CHAR_B10 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~6,520,206 parameters
+ └─ Model Memory Footprint:   ~24.87 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_C1 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C2)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_C2 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C3)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: luong)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~15,995,278 parameters
+ └─ Model Memory Footprint:   ~61.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C4)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C5)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: luong)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~15,995,278 parameters
+ └─ Model Memory Footprint:   ~61.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C6)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+✅ [Async Eval Finished] -> CHAR_C1 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C3 (RNN)
+✅ [Async Eval Finished] -> CHAR_C2 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C4 (RNN)
+✅ [Async Eval Finished] -> CHAR_C3 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C5 (RNN)
+✅ [Async Eval Finished] -> CHAR_C4 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C6 (RNN)
+✅ [Async Eval Finished] -> CHAR_C5 (RNN)
+✅ [Async Eval Finished] -> CHAR_C6 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+
+═══════════════════════════════════════════════════════════════════════════
+🔍 RUNNING HYPERPARAMETER TUNING (FINE - CHAR | 5 Epochs)
+═══════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────
+🏆 [FINE TUNE CONFIGURATION - STUDY C WINNER]
+ ├─ Winner RNN Model:      RNN
+ ├─ Winner Attention:      bahdanau
+ ├─ Winner Bidirectional:  True
+ ├─ Winner Embedding Src:  scratch
+ └─ Winner Freeze Emb:     False
+───────────────────────────────────────────────────────────────────────────
+📋 Configured 6 fine-tuning trials for Study C Winner Architecture (RNN + bahdanau).
+
+🧪 [Trial 1/6] -> LR=0.0005, Dropout=0.2, Emb=64, Hidden=1024, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 1 (TUNE_CHAR_FINE_1) already completed. Skipping training.
+
+🧪 [Trial 2/6] -> LR=0.0001, Dropout=0.3, Emb=32, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 2 (TUNE_CHAR_FINE_2) already completed. Skipping training.
+
+🧪 [Trial 3/6] -> LR=0.0001, Dropout=0.2, Emb=32, Hidden=512, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 3 (TUNE_CHAR_FINE_3) already completed. Skipping training.
+
+🧪 [Trial 4/6] -> LR=0.0005, Dropout=0.3, Emb=32, Hidden=1024, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 4 (TUNE_CHAR_FINE_4) already completed. Skipping training.
+
+🧪 [Trial 5/6] -> LR=0.001, Dropout=0.4, Emb=64, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 5 (TUNE_CHAR_FINE_5) already completed. Skipping training.
+
+🧪 [Trial 6/6] -> LR=0.0001, Dropout=0.3, Emb=128, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 6 (TUNE_CHAR_FINE_6) already completed. Skipping training.
+
+🏆 Best Tuning Parameters Saved -> /workspace/machine-translation-char/data/results/best_config_TUNE_CHAR_FINE.json (Val Loss: 2.9844)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study D (Language Direction Optimization) (CHAR_D1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0005 --dropout 0.2 --emb_dim 32 --hidden_dim 1024 --experiment CHAR_D1 --rnn_type RNN --attention_type bahdanau --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --src_lang en --trg_lang de --batch_size 112 --epochs 10
+📝 Logging initialized -> Dual-streaming outputs to terminal and: /workspace/machine-translation-char/data/results/run_studies.log
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 NMT PERFORMANCE INFRASTRUCTURE ORCHESTRATOR INITIALIZED
+════════════════════════════════════════════════════════════════════════════════
+
+
+════════════════════════════════════════════════════════════════════════════════
+🚀 EXECUTING PIPELINE FOR TOKEN LEVEL: CHAR
+   Mode: ALL | Epoch Strategy: [Tune-coarse: 4 (12 trials), A: 8, B: 8, C: 10, Tune-fine: 5 (6 trials), D/E: 10] | GPUs: 1
+════════════════════════════════════════════════════════════════════════════════
+
+⚡ Running preprocessing routine (token_type=char, mock=False)...
+
+═══════════════════════════════════════════════════════════════════════════
+🔍 RUNNING HYPERPARAMETER TUNING (COARSE - CHAR | 4 Epochs)
+═══════════════════════════════════════════════════════════════════════════
+📋 Configured 12 coarse trials across cell types ['LSTM', 'GRU', 'RNN'].
+
+🧪 [Trial 1/12] -> LR=0.0005, Dropout=0.3, Emb=64, Hidden=512, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 1 (TUNE_CHAR_COARSE_1) already completed. Skipping training.
+
+🧪 [Trial 2/12] -> LR=0.0003, Dropout=0.4, Emb=128, Hidden=256, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 2 (TUNE_CHAR_COARSE_2) already completed. Skipping training.
+
+🧪 [Trial 3/12] -> LR=0.001, Dropout=0.2, Emb=32, Hidden=1024, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 3 (TUNE_CHAR_COARSE_3) already completed. Skipping training.
+
+🧪 [Trial 4/12] -> LR=0.0001, Dropout=0.3, Emb=64, Hidden=512, Cell=LSTM, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 4 (TUNE_CHAR_COARSE_4) already completed. Skipping training.
+
+🧪 [Trial 5/12] -> LR=0.0003, Dropout=0.3, Emb=64, Hidden=512, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 5 (TUNE_CHAR_COARSE_5) already completed. Skipping training.
+
+🧪 [Trial 6/12] -> LR=0.0005, Dropout=0.4, Emb=128, Hidden=256, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 6 (TUNE_CHAR_COARSE_6) already completed. Skipping training.
+
+🧪 [Trial 7/12] -> LR=0.0001, Dropout=0.2, Emb=32, Hidden=1024, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 7 (TUNE_CHAR_COARSE_7) already completed. Skipping training.
+
+🧪 [Trial 8/12] -> LR=0.001, Dropout=0.3, Emb=64, Hidden=512, Cell=GRU, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 8 (TUNE_CHAR_COARSE_8) already completed. Skipping training.
+
+🧪 [Trial 9/12] -> LR=0.0005, Dropout=0.2, Emb=64, Hidden=256, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 9 (TUNE_CHAR_COARSE_9) already completed. Skipping training.
+
+🧪 [Trial 10/12] -> LR=0.0003, Dropout=0.3, Emb=128, Hidden=512, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 10 (TUNE_CHAR_COARSE_10) already completed. Skipping training.
+
+🧪 [Trial 11/12] -> LR=0.0001, Dropout=0.4, Emb=32, Hidden=1024, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 11 (TUNE_CHAR_COARSE_11) already completed. Skipping training.
+
+🧪 [Trial 12/12] -> LR=0.001, Dropout=0.2, Emb=64, Hidden=256, Cell=RNN, Attn=none, BiDir=False
+📦 [Cache Hit] Trial 12 (TUNE_CHAR_COARSE_12) already completed. Skipping training.
+
+🏆 Best Tuning Parameters Saved -> /workspace/machine-translation-char/data/results/best_config_TUNE_CHAR_COARSE.json (Val Loss: 2.9771)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~6,520,206 parameters
+ └─ Model Memory Footprint:   ~24.87 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_A1 (RNN)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A2)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_A2 (RNN)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A3)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             GRU (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=512
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~5,019,278 parameters
+ └─ Model Memory Footprint:   ~19.15 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.001 --dropout 0.3 --emb_dim 64 --hidden_dim 512
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A4)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             GRU (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=512
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~9,055,886 parameters
+ └─ Model Memory Footprint:   ~34.55 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A5)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             LSTM (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=256
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~1,917,582 parameters
+ └─ Model Memory Footprint:   ~7.31 MB
+───────────────────────────────────────────────────────────────────────────
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0003 --dropout 0.4 --emb_dim 128 --hidden_dim 256
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study A (Architecture Benchmarking) (CHAR_A6)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             LSTM (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=256
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~3,363,470 parameters
+ └─ Model Memory Footprint:   ~12.83 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+✅ [Async Eval Finished] -> CHAR_A1 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_A3 (GRU)
+✅ [Async Eval Finished] -> CHAR_A2 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_A4 (GRU)
+✅ [Async Eval Finished] -> CHAR_A3 (GRU)
+
+⚡ [Async Eval Started] -> CHAR_A5 (LSTM)
+✅ [Async Eval Finished] -> CHAR_A4 (GRU)
+
+⚡ [Async Eval Started] -> CHAR_A6 (LSTM)
+✅ [Async Eval Finished] -> CHAR_A5 (LSTM)
+✅ [Async Eval Finished] -> CHAR_A6 (LSTM)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B7)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_B7 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B8)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=64 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,907,726 parameters
+ └─ Model Memory Footprint:   ~45.42 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_B8 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B9)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~12,123,278 parameters
+ └─ Model Memory Footprint:   ~46.25 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study B (Embedding Representation Analysis - EN->DE) (CHAR_B10)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=128 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~12,123,278 parameters
+ └─ Model Memory Footprint:   ~46.25 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+✅ [Async Eval Finished] -> CHAR_B7 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_B9 (RNN)
+✅ [Async Eval Finished] -> CHAR_B8 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_B10 (RNN)
+✅ [Async Eval Finished] -> CHAR_B9 (RNN)
+✅ [Async Eval Finished] -> CHAR_B10 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0001 --dropout 0.4 --emb_dim 32 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: False, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~6,520,206 parameters
+ └─ Model Memory Footprint:   ~24.87 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_C1 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C2)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: none)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~11,799,950 parameters
+ └─ Model Memory Footprint:   ~45.01 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⚡ [Async Eval Started] -> CHAR_C2 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C3)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: luong)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~15,995,278 parameters
+ └─ Model Memory Footprint:   ~61.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C4)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C5)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: luong)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~15,995,278 parameters
+ └─ Model Memory Footprint:   ~61.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study C (Attention Mechanism Optimization - EN->DE) (CHAR_C6)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+✅ [Async Eval Finished] -> CHAR_C1 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C3 (RNN)
+✅ [Async Eval Finished] -> CHAR_C2 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C4 (RNN)
+✅ [Async Eval Finished] -> CHAR_C3 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C5 (RNN)
+✅ [Async Eval Finished] -> CHAR_C4 (RNN)
+
+⚡ [Async Eval Started] -> CHAR_C6 (RNN)
+✅ [Async Eval Finished] -> CHAR_C5 (RNN)
+✅ [Async Eval Finished] -> CHAR_C6 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+
+═══════════════════════════════════════════════════════════════════════════
+🔍 RUNNING HYPERPARAMETER TUNING (FINE - CHAR | 5 Epochs)
+═══════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────
+🏆 [FINE TUNE CONFIGURATION - STUDY C WINNER]
+ ├─ Winner RNN Model:      RNN
+ ├─ Winner Attention:      bahdanau
+ ├─ Winner Bidirectional:  True
+ ├─ Winner Embedding Src:  scratch
+ └─ Winner Freeze Emb:     False
+───────────────────────────────────────────────────────────────────────────
+📋 Configured 6 fine-tuning trials for Study C Winner Architecture (RNN + bahdanau).
+
+🧪 [Trial 1/6] -> LR=0.0005, Dropout=0.2, Emb=64, Hidden=1024, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 1 (TUNE_CHAR_FINE_1) already completed. Skipping training.
+
+🧪 [Trial 2/6] -> LR=0.0001, Dropout=0.3, Emb=32, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 2 (TUNE_CHAR_FINE_2) already completed. Skipping training.
+
+🧪 [Trial 3/6] -> LR=0.0001, Dropout=0.2, Emb=32, Hidden=512, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 3 (TUNE_CHAR_FINE_3) already completed. Skipping training.
+
+🧪 [Trial 4/6] -> LR=0.0005, Dropout=0.3, Emb=32, Hidden=1024, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 4 (TUNE_CHAR_FINE_4) already completed. Skipping training.
+
+🧪 [Trial 5/6] -> LR=0.001, Dropout=0.4, Emb=64, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 5 (TUNE_CHAR_FINE_5) already completed. Skipping training.
+
+🧪 [Trial 6/6] -> LR=0.0001, Dropout=0.3, Emb=128, Hidden=256, Cell=RNN, Attn=bahdanau, BiDir=True
+📦 [Cache Hit] Trial 6 (TUNE_CHAR_FINE_6) already completed. Skipping training.
+
+🏆 Best Tuning Parameters Saved -> /workspace/machine-translation-char/data/results/best_config_TUNE_CHAR_FINE.json (Val Loss: 2.9844)
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study D (Language Direction Optimization) (CHAR_D1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024 --experiment CHAR_D1 --rnn_type RNN --attention_type bahdanau --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --src_lang en --trg_lang de --batch_size 112 --epochs 10
+⏱️ Done. Duration: 5496.26s | Avg/Epoch: 549.63s
+
+⚡ [Async Eval Started] -> CHAR_D1 (RNN)
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study D (Language Direction Optimization) (CHAR_D2)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024 --experiment CHAR_D2 --rnn_type RNN --attention_type bahdanau --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --src_lang de --trg_lang en --batch_size 112 --epochs 10
+✅ [Async Eval Finished] -> CHAR_D1 (RNN)
+⏱️ Done. Duration: 5478.36s | Avg/Epoch: 547.84s
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+
+⚡ [Async Eval Started] -> CHAR_D2 (RNN)
+✅ [Async Eval Finished] -> CHAR_D2 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+🎯 Optimization Checkpoint Found! Applying Tuned Parameters: --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024
+
+───────────────────────────────────────────────────────────────────────────
+📐 [DYNAMIC STUDY ANALYSIS] - Study E (Generalization & Pivot Pipeline) (CHAR_E1)
+ ├─ Tokenizer Mode:           CHAR
+ ├─ Architecture:             RNN (BiDirect: True, Attention: bahdanau)
+ ├─ Dimensions:               Emb=32 | Hidden=1024
+ ├─ Batch Size (N samples):   112 sequences / batch
+ ├─ Batch Shape Estimate:     [112, 256] (0.2188 MB per batch tensor)
+ ├─ Total Model Parameters:   ~17,045,902 parameters
+ └─ Model Memory Footprint:   ~65.02 MB
+───────────────────────────────────────────────────────────────────────────
+
+
+🚀 Launching DDP Execution Unit (1 processes): /workspace/machine-translation-char/.venv/bin/python -m torch.distributed.run --nproc_per_node=1 /workspace/machine-translation-char/src/train.py --grad_accum_steps 4 --lr 0.0005 --dropout 0.2 --emb_dim 64 --hidden_dim 1024 --experiment CHAR_E1 --rnn_type RNN --attention_type bahdanau --bidirectional True --token_type char --embedding_source scratch --freeze_emb False --src_lang en --trg_lang sv --batch_size 112 --epochs 10
+⏱️ Done. Duration: 5441.92s | Avg/Epoch: 544.19s
+
+⏳ [Study Barrier] Waiting for background evaluation tasks to complete...
+
+⚡ [Async Eval Started] -> CHAR_E1 (RNN)
+✅ [Async Eval Finished] -> CHAR_E1 (RNN)
+🎯 [Study Barrier Cleared] All study models evaluated successfully.
+
+
+📊 Launching Formal Quantitative Pivot Dataset Evaluation (DE ➔ EN ➔ SV)...
+
+================================================================================
+📊 SUMMARY EVALUATION REPORT (CHAR LEVEL)
+================================================================================
+         Experiment RNN Type Attention Token Type Embedding   BLEU  METEOR  Best Val Loss  Epochs Trained Train Time Inference Time
+            CHAR_C4      RNN  bahdanau       char   scratch 2.1400  9.4183       2.972791            10.0    5427.1s         47.56s
+            CHAR_C6      RNN  bahdanau       char   scratch 1.9073 10.0736       2.963647            10.0    3820.6s         47.74s
+            CHAR_A4      GRU      none       char   scratch 1.4652  8.9913       2.949429             8.0    2138.4s         35.38s
+            CHAR_C5      RNN     luong       char   scratch 1.4159  9.5124       2.959255            10.0    5492.8s         43.97s
+            CHAR_A3      GRU      none       char   scratch 1.3918  9.9281       2.969355             8.0    1307.9s         34.16s
+            CHAR_E1      RNN  bahdanau       char   scratch 1.3022  4.2989       3.025071            10.0    2618.4s         50.09s
+            CHAR_C3      RNN     luong       char   scratch 1.2578  9.7770       2.963493            10.0    2742.6s         45.03s
+            CHAR_D1      RNN  bahdanau       char   scratch 1.2427 10.1739       2.981956            10.0    2177.5s         47.40s
+            CHAR_B8      RNN      none       char   scratch 1.1025  9.8497       2.979639             8.0    1105.6s         37.29s
+            CHAR_A2      RNN      none       char   scratch 1.0809  9.9836       2.980176             8.0    1106.4s         36.49s
+            CHAR_B7      RNN      none       char   scratch 1.0703 10.0195       2.980822             8.0    1109.2s         36.93s
+            CHAR_C2      RNN      none       char   scratch 1.0651  9.7136       2.980770            10.0    1531.5s         37.15s
+           CHAR_B10      RNN      none       char   scratch 1.0560  9.5762       2.975318             8.0    1577.1s         38.70s
+            CHAR_B9      RNN      none       char   scratch 1.0451  8.9987       2.977036             8.0    1091.6s         37.03s
+            CHAR_A6     LSTM      none       char   scratch 0.6007  9.1699       2.977603             8.0    1453.8s         36.68s
+            CHAR_C1      RNN      none       char   scratch 0.2894  8.5349       2.991521            10.0     650.2s         32.95s
+            CHAR_A1      RNN      none       char   scratch 0.2886  8.3108       2.991626             8.0     653.8s         34.04s
+            CHAR_A5     LSTM      none       char   scratch 0.0795  9.5781       3.010060             8.0     859.3s         33.39s
+            CHAR_D2      RNN  bahdanau       char   scratch 0.0068  0.6680       3.448235            10.0     529.3s         51.31s
+         CHAR_PIVOT    PIVOT     pivot       char       n/a 0.0000  0.0300            NaN             NaN        N/A            N/A
+   TUNE_CHAR_FINE_6      RNN  bahdanau       char   scratch    NaN     NaN       2.994439             5.0    1690.1s            N/A
+   TUNE_CHAR_FINE_5      RNN  bahdanau       char   scratch    NaN     NaN       2.993294             5.0    2930.5s            N/A
+   TUNE_CHAR_FINE_4      RNN  bahdanau       char   scratch    NaN     NaN       3.019733             5.0    1114.3s            N/A
+   TUNE_CHAR_FINE_3      RNN  bahdanau       char   scratch    NaN     NaN       3.003937             5.0     559.6s            N/A
+   TUNE_CHAR_FINE_2      RNN  bahdanau       char   scratch    NaN     NaN       2.995400             5.0     539.5s            N/A
+   TUNE_CHAR_FINE_1      RNN  bahdanau       char   scratch    NaN     NaN       2.984410             5.0    2736.7s            N/A
+TUNE_CHAR_COARSE_12      RNN      none       char   scratch    NaN     NaN       2.991931             4.0     588.0s            N/A
+TUNE_CHAR_COARSE_11      RNN      none       char   scratch    NaN     NaN       2.991789             4.0     660.1s            N/A
+TUNE_CHAR_COARSE_10      RNN      none       char   scratch    NaN     NaN       2.994420             4.0     428.3s            N/A
+ TUNE_CHAR_COARSE_9      RNN      none       char   scratch    NaN     NaN       2.993082             4.0     402.9s            N/A
+ TUNE_CHAR_COARSE_8      GRU      none       char   scratch    NaN     NaN       2.977063             4.0     526.5s            N/A
+ TUNE_CHAR_COARSE_7      GRU      none       char   scratch    NaN     NaN       2.997130             4.0     809.0s            N/A
+ TUNE_CHAR_COARSE_6      GRU      none       char   scratch    NaN     NaN       2.996943             4.0     513.3s            N/A
+ TUNE_CHAR_COARSE_5      GRU      none       char   scratch    NaN     NaN       2.998367             4.0     523.0s            N/A
+ TUNE_CHAR_COARSE_4     LSTM      none       char   scratch    NaN     NaN       2.991662             4.0    1148.1s            N/A
+ TUNE_CHAR_COARSE_3     LSTM      none       char   scratch    NaN     NaN       3.012611             4.0     900.5s            N/A
+ TUNE_CHAR_COARSE_2     LSTM      none       char   scratch    NaN     NaN       2.988138             4.0     881.7s            N/A
+ TUNE_CHAR_COARSE_1     LSTM      none       char   scratch    NaN     NaN       3.005397             4.0    1147.3s            N/A
+================================================================================
+📁 Summary report written to: /workspace/machine-translation-char/data/results/evaluation_report_char.csv
+
+📊 Attention heatmap visualization saved to: /workspace/machine-translation-char/data/results/CHAR_C4_attention.png
+
+════════════════════════════════════════════════════════════════════════════════
+🎉 MASTER ORCHESTRATION PIPELINE COMPLETED SUCCESSFULLY ON GPU/CPU CLUSTER
+════════════════════════════════════════════════════════════════════════════════
+
+
+🛑 Pipeline complete. Stopping pod 2n1qkasxra25ym in 45s to save GPU cost (data on the network volume is unaffected - Ctrl+C now to cancel).
+   ...45s
+   ...40s
+   ...35s
+   ...30s
+   ...25s
+   ...20s
+   ...15s
+   ...10s
+   ...5s
+⚠️  Stop request failed (HTTP 403): 

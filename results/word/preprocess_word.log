@@ -1,0 +1,39 @@
+📝 Logging initialized -> Dual-streaming outputs to terminal and: data/results/preprocess_word.log
+📦 [DE-EN SPLITS] Train: 121,749 | Val: 13,528 | Test: 33,820
+📦 [EN-DE SPLITS] Train: 121,749 | Val: 13,528 | Test: 33,820
+📦 [EN-SV SPLITS] Train: 118,922 | Val: 13,214 | Test: 33,035
+
+───────────────────────────────────────────────────────────────────────────
+⚡ [OFFLINE BINARY CACHING & TENSOR PRE-SERIALIZATION]
+───────────────────────────────────────────────────────────────────────────
+
+📦 Pre-tokenizing & caching binary tensors for pair: DE -> EN
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_train_de_en_word.pt
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_val_de_en_word.pt
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_test_de_en_word.pt
+
+📦 Pre-tokenizing & caching binary tensors for pair: EN -> DE
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_train_en_de_word.pt
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_val_en_de_word.pt
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_test_en_de_word.pt
+
+📦 Pre-tokenizing & caching binary tensors for pair: EN -> SV
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_train_en_sv_word.pt
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_val_en_sv_word.pt
+⚡ Binary matrix cache saved -> /workspace/machine-translation/data/processed/.matrix_cache/matrix_test_en_sv_word.pt
+
+✓ Dataset preprocessing and binary caching completed successfully.
+📝 Logging initialized -> Dual-streaming outputs to terminal and: data/results/preprocess_word.log
+✓ Processed dataset CSV splits already exist locally. Skipping raw text cleaning.
+
+───────────────────────────────────────────────────────────────────────────
+⚡ [OFFLINE BINARY CACHING & TENSOR PRE-SERIALIZATION]
+───────────────────────────────────────────────────────────────────────────
+
+📦 Pre-tokenizing & caching binary tensors for pair: DE -> EN
+
+📦 Pre-tokenizing & caching binary tensors for pair: EN -> DE
+
+📦 Pre-tokenizing & caching binary tensors for pair: EN -> SV
+
+✓ Dataset preprocessing and binary caching completed successfully.

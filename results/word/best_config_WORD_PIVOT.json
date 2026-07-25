@@ -1,0 +1,13 @@
+{
+    "experiment": "WORD_PIVOT",
+    "token_type": "word",
+    "attention_type": "pivot",
+    "rnn_type": "PIVOT",
+    "embedding_source": "n/a",
+    "n_samples": 3000,
+    "intermediate_en_bleu": 3.92,
+    "intermediate_en_meteor": 21.96,
+    "bleu": 1.14,
+    "meteor": 11.63,
+    "eval_split": "pivot_aligned_eval_set"
+}

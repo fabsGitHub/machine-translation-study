@@ -1,0 +1,6 @@
+Tokenization,Top Study Run,Best Architectural Variant,BLEU Score,Metric 2 (METEOR),Train Time,Inference Time
+Word-Level,Study A3,Uni-GRU (Embeds: scratch),3.33,0.18,276.6s,1.4ms / sent
+Word-Level,Study B3,Uni-GRU (Embeds: word2vec),4.02,0.21,266.7s,1.7ms / sent
+Word-Level,Study C6,Bi-RNN (Embeds: word2vec) w/ Bahdanau Attn,8.15,0.29,349.5s,1.6ms / sent
+Word-Level,Study D2,Bi-RNN (Embeds: word2vec) w/ Bahdanau Attn,10.86,0.33,302.4s,1.5ms / sent
+Word-Level,Study E1,Bi-RNN (Embeds: word2vec) w/ Bahdanau Attn,10.74,0.34,332.2s,1.5ms / sent

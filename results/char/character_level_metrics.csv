@@ -1,0 +1,26 @@
+Study,Model Config Tag,Hyperparameters (LR / Dropout),Best Val Loss,BLEU (↑),METEOR (↑)
+Study CHAR_A1,RNN + none Attention,"LR: 0.001, Drop: 0.4",3.0029938119523067,N/A,N/A
+Study CHAR_A2,RNN + none Attention,"LR: 0.001, Drop: 0.4",3.029219868335318,N/A,N/A
+Study CHAR_A3,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.025338495031316,N/A,N/A
+Study CHAR_A4,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.037541782602351,N/A,N/A
+Study CHAR_A5,LSTM + none Attention,"LR: 0.001, Drop: 0.4",4.054522514343262,N/A,N/A
+Study CHAR_A6,LSTM + none Attention,"LR: 0.001, Drop: 0.4",4.098902225494385,N/A,N/A
+Study CHAR_B10,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.690556049346924,N/A,N/A
+Study CHAR_B7,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.963561773300171,N/A,N/A
+Study CHAR_B8,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.9025344848632812,N/A,N/A
+Study CHAR_B9,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.609011173248291,N/A,N/A
+Study CHAR_C1,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.9025344848632812,N/A,N/A
+Study CHAR_C2,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.9025344848632812,N/A,N/A
+Study CHAR_C3,GRU + luong Attention,"LR: 0.001, Drop: 0.4",3.555870294570923,N/A,N/A
+Study CHAR_C4,GRU + bahdanau Attention,"LR: 0.001, Drop: 0.4",3.509591579437256,N/A,N/A
+Study CHAR_C5,RNN + luong Attention,"LR: 0.001, Drop: 0.4",3.2364611625671387,N/A,N/A
+Study CHAR_C6,RNN + bahdanau Attention,"LR: 0.001, Drop: 0.4",3.31314754486084,N/A,N/A
+Study CHAR_D1,GRU + none Attention,"LR: 0.001, Drop: 0.4",2.9962026391710554,N/A,N/A
+Study CHAR_D2,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.9025344848632812,N/A,N/A
+Study CHAR_E1,GRU + none Attention,"LR: 0.001, Drop: 0.4",3.021484409059797,N/A,N/A
+Study TUNE_CHAR_SAMPLE_1,RNN,"LR: 0.0001, Drop: 0.2",4.178741931915283,N/A,N/A
+Study TUNE_CHAR_SAMPLE_2,RNN,"LR: 0.0001, Drop: 0.2",4.128168106079102,N/A,N/A
+Study TUNE_CHAR_SAMPLE_3,RNN,"LR: 0.001, Drop: 0.4",3.1244986057281494,N/A,N/A
+Study TUNE_CHAR_SAMPLE_4,GRU,"LR: 0.0005, Drop: 0.3",3.856668472290039,N/A,N/A
+Study TUNE_CHAR_SAMPLE_5,GRU,"LR: 0.001, Drop: 0.4",3.3057262897491455,N/A,N/A
+Study TUNE_CHAR_SAMPLE_6,GRU,"LR: 0.0005, Drop: 0.2",3.8634612560272217,N/A,N/A

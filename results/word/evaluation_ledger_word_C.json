@@ -1,0 +1,212 @@
+{
+    "WORD_C1": {
+        "rnn_type": "GRU",
+        "bidirectional": false,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "none",
+        "train_time": "276.7s",
+        "inference_time": "1.6ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 3.8359489179684356,
+            "mean_meteor": 0.1994363829341485
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3390,
+                "bleu": 8.13,
+                "meteor": 0.283
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10460,
+                "bleu": 4.48,
+                "meteor": 0.2145
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 10165,
+                "bleu": 3.73,
+                "meteor": 0.1868
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9796,
+                "bleu": 3.36,
+                "meteor": 0.1676
+            }
+        }
+    },
+    "WORD_C2": {
+        "rnn_type": "GRU",
+        "bidirectional": false,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "none",
+        "train_time": "274.1s",
+        "inference_time": "1.3ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 3.933125251493038,
+            "mean_meteor": 0.20442795040084766
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3390,
+                "bleu": 8.15,
+                "meteor": 0.2824
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10460,
+                "bleu": 4.55,
+                "meteor": 0.2183
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 10165,
+                "bleu": 3.8,
+                "meteor": 0.193
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9796,
+                "bleu": 3.48,
+                "meteor": 0.1744
+            }
+        }
+    },
+    "WORD_C3": {
+        "rnn_type": "GRU",
+        "bidirectional": false,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "luong",
+        "train_time": "322.4s",
+        "inference_time": "1.5ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 6.8697252395918795,
+            "mean_meteor": 0.26739999544111576
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3390,
+                "bleu": 11.9,
+                "meteor": 0.3496
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10460,
+                "bleu": 8.06,
+                "meteor": 0.2866
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 10165,
+                "bleu": 6.8,
+                "meteor": 0.2556
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9796,
+                "bleu": 5.99,
+                "meteor": 0.2307
+            }
+        }
+    },
+    "WORD_C4": {
+        "rnn_type": "GRU",
+        "bidirectional": false,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "bahdanau",
+        "train_time": "330.6s",
+        "inference_time": "1.5ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 7.945981459088555,
+            "mean_meteor": 0.2876089054332655
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3390,
+                "bleu": 13.09,
+                "meteor": 0.3723
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10460,
+                "bleu": 9.41,
+                "meteor": 0.3099
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 10165,
+                "bleu": 8.0,
+                "meteor": 0.2757
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9796,
+                "bleu": 6.87,
+                "meteor": 0.2469
+            }
+        }
+    },
+    "WORD_C5": {
+        "rnn_type": "RNN",
+        "bidirectional": true,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "luong",
+        "train_time": "343.4s",
+        "inference_time": "1.7ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 2.507939174337106,
+            "mean_meteor": 0.1650554180374969
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3390,
+                "bleu": 5.26,
+                "meteor": 0.241
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10460,
+                "bleu": 3.14,
+                "meteor": 0.1819
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 10165,
+                "bleu": 2.23,
+                "meteor": 0.1511
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9796,
+                "bleu": 2.28,
+                "meteor": 0.1353
+            }
+        }
+    },
+    "WORD_C6": {
+        "rnn_type": "RNN",
+        "bidirectional": true,
+        "embedding_source": "word2vec",
+        "freeze_emb": false,
+        "attention_type": "bahdanau",
+        "train_time": "349.5s",
+        "inference_time": "1.6ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 8.14784382054835,
+            "mean_meteor": 0.29021435779479826
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 3390,
+                "bleu": 13.3,
+                "meteor": 0.3772
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 10460,
+                "bleu": 10.03,
+                "meteor": 0.3178
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 10165,
+                "bleu": 8.3,
+                "meteor": 0.278
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 9796,
+                "bleu": 6.9,
+                "meteor": 0.2433
+            }
+        }
+    }
+}

@@ -1,0 +1,72 @@
+{
+    "CHAR_D1": {
+        "rnn_type": "GRU",
+        "bidirectional": false,
+        "embedding_source": "scratch",
+        "freeze_emb": false,
+        "attention_type": "none",
+        "train_time": "58.7s",
+        "inference_time": "1.1ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 0.04430336944473213,
+            "mean_meteor": 0.1387781511648597
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 1,
+                "bleu": 0.07,
+                "meteor": 0.0181
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 1,
+                "bleu": 0.11,
+                "meteor": 0.0798
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 16,
+                "bleu": 0.05,
+                "meteor": 0.1008
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 982,
+                "bleu": 0.05,
+                "meteor": 0.1396
+            }
+        }
+    },
+    "CHAR_D2": {
+        "rnn_type": "GRU",
+        "bidirectional": false,
+        "embedding_source": "scratch",
+        "freeze_emb": false,
+        "attention_type": "none",
+        "train_time": "7.6s",
+        "inference_time": "1.0ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 0.010600033320294258,
+            "mean_meteor": 0.07062071940292089
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 12,
+                "bleu": 0.03,
+                "meteor": 0.0242
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 49,
+                "bleu": 0.02,
+                "meteor": 0.0572
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 227,
+                "bleu": 0.01,
+                "meteor": 0.0664
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 712,
+                "bleu": 0.01,
+                "meteor": 0.0737
+            }
+        }
+    }
+}

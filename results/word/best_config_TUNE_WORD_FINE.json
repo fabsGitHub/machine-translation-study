@@ -1,0 +1,12 @@
+{
+    "lr": 0.0005,
+    "dropout": 0.2,
+    "emb_dim": 256,
+    "hidden_dim": 1024,
+    "rnn_type": "LSTM",
+    "attention_type": "bahdanau",
+    "bidirectional": "False",
+    "embedding_source": "scratch",
+    "freeze_emb": "True",
+    "val_loss": 6.073540894490368
+}

@@ -1,0 +1,44 @@
+{
+    "experiment": "TUNE_WORD_FINE_3",
+    "rnn_type": "LSTM",
+    "bidirectional": false,
+    "epochs": 5,
+    "lr": 0.0001,
+    "dropout": 0.2,
+    "emb_dim": 128,
+    "hidden_dim": 512,
+    "batch_size": 256,
+    "grad_accum_steps": 4,
+    "clip": 1.0,
+    "tf_ratio": 0.5,
+    "attention_type": "bahdanau",
+    "token_type": "word",
+    "embedding_source": "scratch",
+    "freeze_emb": true,
+    "src_lang": "en",
+    "trg_lang": "de",
+    "resume": true,
+    "eval_max_samples": 1000,
+    "val_max_samples": null,
+    "train_time": "503.1s",
+    "best_val_loss": 6.674491477462481,
+    "val_loss": 6.674491477462481,
+    "epochs_trained": 5,
+    "loss_history": {
+        "train": [
+            7.5422923394611905,
+            6.5663977510788865,
+            6.53302039919781,
+            6.5031062825387265,
+            6.458726993128031
+        ],
+        "val": [
+            6.678258311073735,
+            6.723080797015496,
+            6.735780275092934,
+            6.689974829835712,
+            6.674491477462481
+        ]
+    },
+    "completed": true
+}

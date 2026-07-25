@@ -1,0 +1,35 @@
+# --- Model checkpoints & heavy binaries: never commit these ---
+*.pt
+*.pth
+*.pkl
+*.bin
+*.vec
+
+# --- Raw / processed corpora and pretrained embedding files ---
+# (multi-GB, publicly downloadable - see README "Running it yourself")
+data/raw/
+data/processed/
+data/.embeddings_cache/
+data/*.bin
+data/*.vec
+data/*.txt
+
+# --- Python ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- OS ---
+.DS_Store
+
+# --- LaTeX build artifacts (report/) ---
+report/*.aux
+report/*.log
+report/*.out
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz

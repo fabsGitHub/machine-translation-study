@@ -1,0 +1,68 @@
+{
+  "de_en": {
+    "corpus": "de-en",
+    "src_lang": "de",
+    "trg_lang": "en",
+    "n_total_lines": 1920209,
+    "n_empty_src": 2923,
+    "n_empty_trg": 8366,
+    "n_xml_tag_lines_src": 0,
+    "n_xml_tag_lines_trg": 0,
+    "n_usable_after_filtering": 1908920,
+    "pct_usable": 99.41,
+    "de_vocab_size": 616585,
+    "en_vocab_size": 271837,
+    "de_word_len_mean": 23.34,
+    "de_word_len_median": 21.0,
+    "de_word_len_p95": 49.0,
+    "de_word_len_max": 426,
+    "en_word_len_mean": 25.06,
+    "en_word_len_median": 22.0,
+    "en_word_len_p95": 53.0,
+    "en_word_len_max": 668,
+    "length_diff_mean": -1.723,
+    "length_diff_std": 4.764,
+    "pearson_corr_src_trg_len": 0.949
+  },
+  "en_sv": {
+    "corpus": "en-sv",
+    "src_lang": "en",
+    "trg_lang": "sv",
+    "n_total_lines": 1862234,
+    "n_empty_src": 11349,
+    "n_empty_trg": 2462,
+    "n_xml_tag_lines_src": 0,
+    "n_xml_tag_lines_trg": 0,
+    "n_usable_after_filtering": 1848423,
+    "pct_usable": 99.26,
+    "en_vocab_size": 265408,
+    "sv_vocab_size": 582749,
+    "en_word_len_mean": 24.74,
+    "en_word_len_median": 22.0,
+    "en_word_len_p95": 52.0,
+    "en_word_len_max": 668,
+    "sv_word_len_mean": 22.46,
+    "sv_word_len_median": 20.0,
+    "sv_word_len_p95": 48.0,
+    "sv_word_len_max": 432,
+    "length_diff_mean": 2.283,
+    "length_diff_std": 4.707,
+    "pearson_corr_src_trg_len": 0.95
+  },
+  "vocab_sizes": {
+    "DE": 616947,
+    "EN": 271951,
+    "SV": 583163
+  },
+  "sample_representativeness": {
+    "train_sample_size": 121749,
+    "population_de_mean_len": 23.34,
+    "sample_de_mean_len": 23.15,
+    "population_en_mean_len": 25.06,
+    "sample_en_mean_len": 24.26
+  },
+  "recommended_for_report": [
+    "vocab_sizes.png",
+    "combined_length_hist.png"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+    "experiment": "TUNE_CHAR_COARSE_6",
+    "rnn_type": "GRU",
+    "bidirectional": false,
+    "epochs": 4,
+    "lr": 0.0005,
+    "dropout": 0.4,
+    "emb_dim": 128,
+    "hidden_dim": 256,
+    "batch_size": 112,
+    "grad_accum_steps": 4,
+    "clip": 1.0,
+    "tf_ratio": 0.5,
+    "attention_type": "none",
+    "token_type": "char",
+    "embedding_source": "scratch",
+    "freeze_emb": false,
+    "src_lang": "en",
+    "trg_lang": "de",
+    "resume": true,
+    "eval_max_samples": 1000,
+    "val_max_samples": null,
+    "train_time": "513.3s",
+    "best_val_loss": 2.99694341023763,
+    "val_loss": 2.99694341023763,
+    "epochs_trained": 4,
+    "loss_history": {
+        "train": [
+            2.9642620208538153,
+            2.6497763727677355,
+            2.500451085292717,
+            2.397087494901565
+        ],
+        "val": [
+            3.0134417176246644,
+            2.99694341023763,
+            3.0027413169542947,
+            3.011180692911148
+        ]
+    },
+    "completed": true
+}

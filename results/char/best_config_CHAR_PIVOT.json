@@ -1,0 +1,13 @@
+{
+    "experiment": "CHAR_PIVOT",
+    "token_type": "char",
+    "attention_type": "pivot",
+    "rnn_type": "PIVOT",
+    "embedding_source": "n/a",
+    "n_samples": 3000,
+    "intermediate_en_bleu": 0.0,
+    "intermediate_en_meteor": 9.76,
+    "bleu": 0.0,
+    "meteor": 0.03,
+    "eval_split": "pivot_aligned_eval_set"
+}

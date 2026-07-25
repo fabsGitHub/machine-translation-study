@@ -1,0 +1,7 @@
+Tokenization,Study ID,Architectural Variant,BLEU Score,Metric 2 (METEOR),Train Time,Inference Time
+Word-Level,Study C1,Uni-GRU (Embeds: word2vec),3.84,0.20,276.7s,1.6ms / sent
+Word-Level,Study C2,Uni-GRU (Embeds: word2vec),3.93,0.20,274.1s,1.3ms / sent
+Word-Level,Study C3,Uni-GRU (Embeds: word2vec) w/ Luong Attn,6.87,0.27,322.4s,1.5ms / sent
+Word-Level,Study C4,Uni-GRU (Embeds: word2vec) w/ Bahdanau Attn,7.95,0.29,330.6s,1.5ms / sent
+Word-Level,Study C5,Bi-RNN (Embeds: word2vec) w/ Luong Attn,2.51,0.17,343.4s,1.7ms / sent
+Word-Level,Study C6,Bi-RNN (Embeds: word2vec) w/ Bahdanau Attn,8.15,0.29,349.5s,1.6ms / sent

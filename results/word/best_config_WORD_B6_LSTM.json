@@ -1,0 +1,80 @@
+{
+    "experiment": "WORD_B6",
+    "rnn_type": "LSTM",
+    "bidirectional": false,
+    "epochs": 8,
+    "lr": 0.001,
+    "dropout": 0.2,
+    "emb_dim": 300,
+    "hidden_dim": 1024,
+    "batch_size": 256,
+    "grad_accum_steps": 4,
+    "clip": 1.0,
+    "tf_ratio": 0.5,
+    "attention_type": "none",
+    "token_type": "word",
+    "embedding_source": "glove",
+    "freeze_emb": false,
+    "src_lang": "en",
+    "trg_lang": "de",
+    "resume": true,
+    "eval_max_samples": 1000,
+    "val_max_samples": null,
+    "train_time": "572.9s",
+    "best_val_loss": 5.902197082087679,
+    "val_loss": 5.902197082087679,
+    "epochs_trained": 8,
+    "loss_history": {
+        "train": [
+            6.782513701615214,
+            6.522553683329029,
+            6.220809242304633,
+            5.92786106442203,
+            5.6397468452694035,
+            5.388894151238834,
+            5.172715658901119,
+            4.953205605014031
+        ],
+        "val": [
+            6.7996210602094544,
+            6.768313596833427,
+            6.688395113315222,
+            6.486225694980261,
+            6.304057049301435,
+            6.132970333099365,
+            6.0269401208409725,
+            5.902197082087679
+        ]
+    },
+    "completed": true,
+    "bucket_analysis": {
+        "Short (1-10 tokens)": {
+            "sample_count": 103,
+            "bleu": 2.46,
+            "meteor": 20.29
+        },
+        "Medium (11-20 tokens)": {
+            "sample_count": 300,
+            "bleu": 1.76,
+            "meteor": 16.82
+        },
+        "Long (21-30 tokens)": {
+            "sample_count": 290,
+            "bleu": 1.43,
+            "meteor": 14.26
+        },
+        "Very Long (31+ tokens)": {
+            "sample_count": 307,
+            "bleu": 1.51,
+            "meteor": 13.27
+        }
+    },
+    "eval_split": "test",
+    "bleu": 1.572,
+    "Target Metric (BLEU)": 1.572,
+    "bleu_score": 1.572,
+    "overall_corpus_bleu": 1.572,
+    "meteor": 15.349,
+    "mean_meteor": 15.349,
+    "inference_time": "28.88s"
+}

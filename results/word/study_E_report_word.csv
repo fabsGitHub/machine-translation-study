@@ -1,0 +1,2 @@
+Tokenization,Study ID,Architectural Variant,BLEU Score,Metric 2 (METEOR),Train Time,Inference Time
+Word-Level,Study E1,Bi-RNN (Embeds: word2vec) w/ Bahdanau Attn,10.74,0.34,332.2s,1.5ms / sent

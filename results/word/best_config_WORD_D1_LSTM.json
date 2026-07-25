@@ -1,0 +1,84 @@
+{
+    "experiment": "WORD_D1",
+    "rnn_type": "LSTM",
+    "bidirectional": false,
+    "epochs": 10,
+    "lr": 0.0005,
+    "dropout": 0.2,
+    "emb_dim": 256,
+    "hidden_dim": 1024,
+    "batch_size": 256,
+    "grad_accum_steps": 4,
+    "clip": 1.0,
+    "tf_ratio": 0.5,
+    "attention_type": "bahdanau",
+    "token_type": "word",
+    "embedding_source": "scratch",
+    "freeze_emb": true,
+    "src_lang": "en",
+    "trg_lang": "de",
+    "resume": true,
+    "eval_max_samples": 1000,
+    "val_max_samples": null,
+    "train_time": "1311.8s",
+    "best_val_loss": 5.554683316428706,
+    "val_loss": 5.554683316428706,
+    "epochs_trained": 10,
+    "loss_history": {
+        "train": [
+            6.764356986815188,
+            6.388448211325317,
+            6.051308524708788,
+            5.749891048719903,
+            5.4856091276938175,
+            5.251884814070053,
+            5.0337437536536145,
+            4.852601042815617,
+            4.686658020780868,
+            4.522866994392972
+        ],
+        "val": [
+            6.763282883842036,
+            6.490649142355289,
+            6.274851169226305,
+            6.195817839424565,
+            6.057356969365534,
+            5.887293527711113,
+            5.7657620591937375,
+            5.651482024282779,
+            5.630464526842225,
+            5.554683316428706
+        ]
+    },
+    "completed": true,
+    "bucket_analysis": {
+        "Short (1-10 tokens)": {
+            "sample_count": 103,
+            "bleu": 7.78,
+            "meteor": 25.19
+        },
+        "Medium (11-20 tokens)": {
+            "sample_count": 300,
+            "bleu": 3.71,
+            "meteor": 20.17
+        },
+        "Long (21-30 tokens)": {
+            "sample_count": 290,
+            "bleu": 3.14,
+            "meteor": 19.11
+        },
+        "Very Long (31+ tokens)": {
+            "sample_count": 307,
+            "bleu": 2.48,
+            "meteor": 17.54
+        }
+    },
+    "eval_split": "test",
+    "bleu": 3.1065,
+    "Target Metric (BLEU)": 3.1065,
+    "bleu_score": 3.1065,
+    "overall_corpus_bleu": 3.1065,
+    "meteor": 19.5728,
+    "mean_meteor": 19.5728,
+    "inference_time": "43.64s"
+}

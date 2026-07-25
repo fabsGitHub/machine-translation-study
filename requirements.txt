@@ -1,0 +1,10 @@
+torch>=2.0.0
+pandas
+numpy
+matplotlib
+seaborn
+pyyaml
+sacrebleu
+nltk
+scikit-learn
+gensim

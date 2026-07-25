@@ -1,0 +1,12 @@
+{
+    "lr": 0.001,
+    "dropout": 0.3,
+    "emb_dim": 64,
+    "hidden_dim": 512,
+    "rnn_type": "GRU",
+    "attention_type": "none",
+    "bidirectional": "False",
+    "embedding_source": "scratch",
+    "freeze_emb": "False",
+    "val_loss": 2.977063079675039
+}

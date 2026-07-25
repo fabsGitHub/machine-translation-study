@@ -1,0 +1,37 @@
+{
+    "CHAR_E1": {
+        "rnn_type": "GRU",
+        "bidirectional": false,
+        "embedding_source": "scratch",
+        "freeze_emb": false,
+        "attention_type": "none",
+        "train_time": "54.7s",
+        "inference_time": "1.1ms / sent",
+        "metrics": {
+            "overall_corpus_bleu": 0.08197175697873124,
+            "mean_meteor": 0.08120296859461075
+        },
+        "length_bucket_analysis": {
+            "Short (1-10 tokens)": {
+                "sample_count": 0,
+                "bleu": 0.0,
+                "meteor": 0.0
+            },
+            "Medium (11-20 tokens)": {
+                "sample_count": 5,
+                "bleu": 0.11,
+                "meteor": 0.0461
+            },
+            "Long (21-30 tokens)": {
+                "sample_count": 14,
+                "bleu": 0.1,
+                "meteor": 0.0699
+            },
+            "Very Long (31+ tokens)": {
+                "sample_count": 981,
+                "bleu": 0.08,
+                "meteor": 0.0815
+            }
+        }
+    }
+}
