@@ -12,6 +12,20 @@ small independent research pipeline: five sequential ablation studies
 generalization), two full tokenization strategies trained end-to-end, and
 a from-scratch reproduction of the classic pivot-translation trick.
 
+**[`nmt_pipeline.py`](nmt_pipeline.py)** is a single-file version of the
+entire `src/` codebase (everything except the visualization/report-figure
+scripts), generated directly from the modular files rather than
+hand-duplicated, so the two never drift apart - for course submission
+formats that expect one `.py` file. A `--task` flag selects which of the
+original entry points to run (`preprocess`, `train`, `evaluate`, `pivot`,
+`build-pivot-eval`, or `study` for the full orchestrator - see the file's
+own module docstring for exact invocations). Verified end-to-end on real
+GPU hardware, including the trickiest part: the orchestrator launches
+training as a subprocess of *itself* via `torch.distributed.run`, which in
+turn launches evaluation as another subprocess of itself for its automated
+BLEU/METEOR backfill - both self-invocation chains were run for real, not
+just reviewed.
+
 ## Results
 
 Best-performing configuration per study, on the held-out 20% test split
