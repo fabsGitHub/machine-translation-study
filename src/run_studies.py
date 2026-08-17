@@ -653,15 +653,7 @@ def execute_tuning(
     lrs = [0.0001, 0.0003, 0.0005, 0.001]
     dropouts = [0.2, 0.3, 0.4]
     emb_dims = [128, 256, 512] if token_type == "word" else [32, 64, 128]
-    # hidden_dim=1024 is excluded for char specifically: on an 8GB GPU it
-    # doesn't fit at any batch size once combined with char-level sequences
-    # (up to 300 timesteps), bidirectional processing, and attention -
-    # confirmed empirically down to batch_size=1 (~10.1GB minimum, WSL2's
-    # GPU-memory-oversubscription-into-system-RAM makes this look like it
-    # "succeeds" instead of a hard OOM, but at <1 sequence/sec it's
-    # unusable thrashing, not real training). word is unaffected - its
-    # worst case (hidden_dim=1024, emb_dim=512) fits comfortably.
-    hidden_dims = [256, 512, 1024] if token_type == "word" else [256, 512]
+    hidden_dims = [256, 512, 1024]
 
     batch_size = get_batch_size("TUNE", token_type)
     results_csv = os.path.join(

@@ -1,47 +1,3 @@
-"""
-Neural machine translation: EN <-> DE <-> SV, single-file version.
-
-Merges the project's modular src/ scripts (dataset.py, models.py, train.py,
-evaluate.py, embeddings.py, preprocess.py, pivot.py, build_pivot_eval_set.py,
-run_studies.py) into one file for course submission, per the assignment's
-"submit as a .py file" requirement. The full modular version - identical
-logic, split across files for readability - lives in the GitHub repo's
-src/ directory; this file is generated from it, not hand-duplicated, so the
-two never drift apart. Visualization/figure-generation scripts
-(explore_data.py, visualize_attention.py, visualize_pivot.py, viz_style.py)
-and the RunPod-only auto_shutdown.py are intentionally NOT merged in - they
-produce report figures / manage cloud infra, neither is part of the actual
-NMT pipeline.
-
-WHY ONE FILE STILL BEHAVES LIKE FIVE SEPARATE SCRIPTS: the original modular
-version launches train.py, evaluate.py, preprocess.py, and pivot.py as
-*subprocesses* of each other (run_studies.py orchestrates whole training
-runs this way; train.py itself subprocess-launches evaluate.py for its
-post-training BLEU/METEOR backfill). That pattern is preserved here rather
-than flattened into direct function calls, because train.py's subprocess is
-launched via `torch.distributed.run` specifically to get DDP environment
-variables (RANK/LOCAL_RANK/WORLD_SIZE) set up identically whether running on
-1 GPU or many - collapsing that into an in-process call would silently
-change single-GPU behavior. So this file re-invokes ITSELF as the
-subprocess target (`sys.executable`, `SELF_PATH`, ...) with a `--task` flag
-selecting which of the five original entry points to run, instead of
-pointing at a sibling file that no longer exists on its own:
-
-    python nmt_pipeline.py --task study --study all --token_type word
-    python nmt_pipeline.py --task preprocess --token_type word
-    python nmt_pipeline.py --task train --experiment X --rnn_type LSTM ...
-    python nmt_pipeline.py --task evaluate evaluate --checkpoint <path>
-    python nmt_pipeline.py --task evaluate report --token_type word
-    python nmt_pipeline.py --task pivot --de_en_model <p> --en_sv_model <p> --text "..."
-    python nmt_pipeline.py --task build-pivot-eval
-
-`--task` defaults to "study" (the most common invocation, matching the
-original `python run_studies.py --study all ...`), so `--study`/
-`--token_type`/etc. still work with no `--task` flag at all for that case.
-
-Run from the repository root (same layout as the modular version): expects
-data/, config/config.yaml, and writes to data/results/ exactly as before.
-"""
 import argparse
 import codecs
 import csv
@@ -64,7 +20,7 @@ from collections import Counter
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, wait
 
 import matplotlib
-matplotlib.use("Agg")  # headless-safe backend, set once before any pyplot import
+matplotlib.use("Agg")  # headless backend
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -88,9 +44,8 @@ try:
 except ImportError:
     meteor_score = None
 
-# Optimize PyTorch's CUDA allocator against fragmentation on long multi-experiment runs
+# reduce CUDA memory fragmentation across many experiments
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
-# Enable TensorCore TF32 execution globally (Ampere+ GPUs; a no-op elsewhere)
 torch.set_float32_matmul_precision("high")
 
 # Ensure required NLTK resources are available
@@ -99,14 +54,7 @@ try:
 except LookupError:
     nltk.download("wordnet", quiet=True)
 
-# ---------------------------------------------------------------------------
-# Shared path constants. This file is meant to sit at the repository root
-# (same level the original src/ directory's parent was), so ROOT_DIR here
-# plays the role the original files' "ROOT_DIR = dirname(SCRIPT_DIR)" did.
-# SELF_PATH is this file's own absolute path, used everywhere the modular
-# version used to build a path to a *different* sibling script for a
-# subprocess launch - see the module docstring above.
-# ---------------------------------------------------------------------------
+# shared path constants
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(ROOT_DIR, "data", "results")
 CONFIG_PATH = os.path.join(ROOT_DIR, "config", "config.yaml")
@@ -114,9 +62,7 @@ SELF_PATH = os.path.abspath(__file__)
 
 
 
-# =============================================================================
 # Configuration loading (config.py)
-# =============================================================================
 
 DEFAULT_CONFIG = {
     "system": {
@@ -124,8 +70,8 @@ DEFAULT_CONFIG = {
         "float32_matmul_precision": "high",
     },
     "data": {
-        "sample_rate": 0.1,  # PDF requires a random 10% sample for training
-        "test_split": 0.2,  # PDF requires 20 percent test set
+        "sample_rate": 0.1, 
+        "test_split": 0.2,  
         "seed": 42,
         "max_word_len": 50,
         "max_char_len": 300,
@@ -165,13 +111,13 @@ DEFAULT_CONFIG = {
 
 
 def load_config(config_path="config/config.yaml"):
-    """Loads operational thresholds and parameter profiles safely from disk with fallback defaults."""
+    """Loads config.yaml, falling back to defaults if missing."""
     if os.path.exists(config_path):
         try:
             with open(config_path, "r", encoding="utf-8") as f:
                 loaded = yaml.safe_load(f)
                 if loaded and isinstance(loaded, dict):
-                    # Perform deep dictionary merge so explicit configs retain hardware defaults
+                    # merge instead of replace, so partial configs keep defaults
                     merged = DEFAULT_CONFIG.copy()
                     for k, v in loaded.items():
                         if isinstance(v, dict) and k in merged and isinstance(merged[k], dict):
@@ -183,20 +129,17 @@ def load_config(config_path="config/config.yaml"):
             pass
     return DEFAULT_CONFIG
 
-# =============================================================================
 # Shared utilities: logging, seeding, checkpoint-cache checks (utils.py)
-# =============================================================================
 
 class DualStreamTee:
-    """
-    Redirects stdout/stderr streams to both the original terminal and a log file simultaneously
-    with buffered thread-safe writing to minimize host stream I/O stalls.
-    """
+    """Mirrors stdout/stderr to both the terminal and a log file."""
     def __init__(self, original_stream, log_file):
+        """Stores the underlying stream and log file."""
         self.original_stream = original_stream
         self.log_file = log_file
 
     def write(self, message):
+        """Writes a message to both the terminal and the log file."""
         self.original_stream.write(message)
         self.original_stream.flush()
         if self.log_file and not self.log_file.closed:
@@ -204,43 +147,37 @@ class DualStreamTee:
             self.log_file.flush()
 
     def flush(self):
+        """Flushes both streams."""
         self.original_stream.flush()
         if self.log_file and not self.log_file.closed:
             self.log_file.flush()
 
 
 def setup_logging(log_filename="execution.log", log_dir="data/results", rank=0):
-    """
-    Initializes dual logging (terminal + file output).
-    Intercepts standard print() calls and Python logger messages so everything
-    is saved to file while remaining visible in the terminal.
-    """
+    """Sets up logging to both terminal and file, and mirrors print() output."""
     if rank != 0:
-        return None  # Suppress duplicate file writes for distributed multi-GPU ranks
+        return None  # only rank 0 logs to file
 
     os.makedirs(log_dir, exist_ok=True)
     log_path = os.path.join(log_dir, log_filename)
 
-    # Configure root logger
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
     formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
-    # Stream Handler (Terminal)
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-    # File Handler (Disk)
     fh = logging.FileHandler(log_path, mode="a", encoding="utf-8")
     fh.setLevel(logging.INFO)
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
-    # Intercept sys.stdout & sys.stderr to mirror all print() calls to the file
+    # mirror print() calls to the log file too
     log_file_obj = open(log_path, mode="a", encoding="utf-8")
     sys.stdout = DualStreamTee(sys.__stdout__, log_file_obj)
     sys.stderr = DualStreamTee(sys.__stderr__, log_file_obj)
@@ -250,34 +187,29 @@ def setup_logging(log_filename="execution.log", log_dir="data/results", rank=0):
 
 
 def set_seed(seed=42, deterministic=False):
-    """
-    Sets global random seeds and configures Ampere GPU optimizations (TF32 and cuDNN benchmark mode).
-    """
+    """Sets random seeds and configures GPU precision/determinism settings."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    
+
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
-        
-        # Enable Tensor Core TF32 MatMul precision globally across Ampere GPUs
+
         torch.set_float32_matmul_precision('high')
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
-        
+
         if deterministic:
             torch.backends.cudnn.deterministic = True
             torch.backends.cudnn.benchmark = False
         else:
-            # Enable cuDNN autotuning benchmark for optimal fixed-shape convolution & GEMM kernels
+            # autotune convolution kernels for fixed input shapes
             torch.backends.cudnn.deterministic = False
             torch.backends.cudnn.benchmark = True
 
 
 def check_artifact_cache(output_dir, experiment_tags):
-    """
-    Verifies existence of experiment model checkpoints and associated configuration files.
-    """
+    """Checks whether a cached model + config exist for any of the given experiment tags."""
     for tag in experiment_tags:
         cfg = os.path.join(output_dir, f"best_config_{tag}.json")
         pt = os.path.join(output_dir, f"best_model_{tag}.pt")
@@ -287,10 +219,7 @@ def check_artifact_cache(output_dir, experiment_tags):
 
 
 def is_cache_valid(model_path, config_path):
-    """
-    Checks if a cached model exists, was successfully completed, 
-    and optionally met target epoch requirements.
-    """
+    """Checks whether a cached model finished training successfully."""
     if not (os.path.exists(model_path) and os.path.exists(config_path)):
         return False
         
@@ -307,18 +236,11 @@ def is_cache_valid(model_path, config_path):
 
 
 
-# =============================================================================
 # Vocabulary, tokenization, Dataset/Sampler/DataLoader (dataset.py)
-# =============================================================================
 
 
 def _worker_init_fn(_worker_id):
-    # Cap intra-op threads *inside DataLoader worker processes only* - without this,
-    # each forked worker independently tries to use all CPU cores for its own tensor
-    # ops, and num_workers copies of that compete for the same physical cores. The
-    # main training process must stay unrestricted (it does the actual GPU dispatch
-    # and any CPU-side collation), which a process-wide torch.set_num_threads(1)
-    # at import time would have also throttled.
+    """Caps each DataLoader worker to 1 thread so workers don't fight over CPU cores."""
     torch.set_num_threads(1)
 
 PAD_TOKEN = "<PAD>"
@@ -333,12 +255,12 @@ EOS_IDX = 3
 
 
 def pad_vocab_size(size, multiple=16):
+    """Rounds a vocab size up to the nearest multiple."""
     return ((size + multiple - 1) // multiple) * multiple
 
 
 def _build_vocab_worker(chunk, token_type):
-    """Returns token->frequency counts (not just a unique set) so build_vocab
-    can rank and cap the vocabulary by frequency across worker chunks."""
+    """Counts token frequencies in a chunk of sentences (word or char level)."""
     counts = Counter()
     if token_type == "char":
         for sentence in chunk:
@@ -358,6 +280,7 @@ def _numericalize_chunk_worker(
     src_max_idx,
     trg_max_idx,
 ):
+    """Converts a chunk of text pairs into padded token-index arrays."""
     results = []
     src_get = src_stoi.get
     trg_get = trg_stoi.get
@@ -394,8 +317,10 @@ def _numericalize_chunk_worker(
 
 
 class Vocabulary:
+    """Maps tokens (words or characters) to integer indices and back."""
 
     def __init__(self, token_type="word", pad_multiple=16, max_size=None):
+        """Sets up the vocab with the 4 special tokens (PAD/UNK/SOS/EOS)."""
         self.token_type = token_type
         self.pad_multiple = pad_multiple
         self.max_size = max_size
@@ -413,19 +338,23 @@ class Vocabulary:
         }
 
     def __len__(self):
+        """Returns the vocab size."""
         return len(self.itos)
 
     @property
     def padded_size(self):
+        """Returns the vocab size rounded up for GPU-friendly tensor shapes."""
         return pad_vocab_size(len(self.itos), multiple=self.pad_multiple)
 
     def tokenize(self, text):
+        """Splits text into characters or words, depending on token_type."""
         text = str(text).strip()
         if self.token_type == "char":
             return list(text)
         return text.split()
 
     def build_vocab(self, sentence_list):
+        """Builds the vocab from a list of sentences, keeping the most frequent tokens."""
         num_sentences = len(sentence_list)
         total_counts = Counter()
 
@@ -450,9 +379,7 @@ class Vocabulary:
             for sentence in sentence_list:
                 total_counts.update(self.tokenize(sentence))
 
-        # Rank by frequency so max_size truncation (if set) keeps the most useful
-        # tokens and drops the long tail (typos, one-off names/numbers) into <UNK>
-        # instead of growing the embedding/output-projection layers unboundedly.
+        # keep only the most frequent tokens, rest fall back to <UNK>
         ranked_tokens = [tok for tok, _ in total_counts.most_common(self.max_size)]
         for token in ranked_tokens:
             if token not in self.stoi:
@@ -461,6 +388,7 @@ class Vocabulary:
                 self.itos[idx] = token
 
     def numericalize(self, text):
+        """Converts text into a list of vocab indices."""
         tokenized = self.tokenize(text)
         max_valid_idx = len(self.itos) - 1
         indices = []
@@ -475,6 +403,7 @@ class Vocabulary:
 
 
 class PretokenizedNMTDataset(Dataset):
+    """Dataset of tokenized sentence pairs, cached as flat index arrays on disk."""
 
     def __init__(
         self,
@@ -486,6 +415,7 @@ class PretokenizedNMTDataset(Dataset):
         trg_vocab=None,
         mock_mode=False,
     ):
+        """Loads a cached tensor matrix if present, otherwise tokenizes the CSV and builds one."""
         self.src_lang = src_lang
         self.trg_lang = trg_lang
         self.token_type = token_type
@@ -621,9 +551,11 @@ class PretokenizedNMTDataset(Dataset):
         print(f"⚡ Binary matrix cache saved -> {cache_path}")
 
     def __len__(self):
+        """Returns the number of sentence pairs."""
         return len(self.src_offsets) - 1
 
     def __getitem__(self, idx):
+        """Returns the src/trg index tensors for one sentence pair."""
         s_start, s_end = self.src_offsets[idx], self.src_offsets[idx + 1]
         t_start, t_end = self.trg_offsets[idx], self.trg_offsets[idx + 1]
 
@@ -634,8 +566,10 @@ class PretokenizedNMTDataset(Dataset):
 
 
 class BucketBatchSampler(Sampler):
+    """Batches similar-length sequences together to minimize padding waste."""
 
     def __init__(self, dataset, batch_size, shuffle=True, mega_batch_mult=100):
+        """Precomputes sequence lengths used for bucketing."""
         self.dataset = dataset
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -654,6 +588,7 @@ class BucketBatchSampler(Sampler):
             )
 
     def __iter__(self):
+        """Yields batches of indices, sorted by length within shuffled mega-batches."""
         indices = np.arange(len(self.dataset))
         if self.shuffle:
             np.random.shuffle(indices)
@@ -667,14 +602,7 @@ class BucketBatchSampler(Sampler):
                 batch = sorted_order[j : j + self.batch_size]
                 batches.append(batch)
 
-        # Drop a trailing partial batch when shuffling (standard drop_last
-        # behavior, keeps batch statistics stable) - but only if there is at
-        # least one other batch to fall back on. Since mega_batch_size is a
-        # multiple of batch_size, at most the very last batch overall can ever
-        # be partial. Unconditionally dropping any partial batch breaks any
-        # dataset smaller than batch_size (e.g. --mock mode's 8 sentences) -
-        # every batch is partial, so all get dropped and the DataLoader
-        # silently yields nothing.
+        # drop a trailing partial batch, but only if another batch remains
         if self.shuffle and len(batches) > 1 and len(batches[-1]) < self.batch_size:
             batches.pop()
 
@@ -685,10 +613,12 @@ class BucketBatchSampler(Sampler):
             yield batch
 
     def __len__(self):
+        """Returns the number of batches."""
         return (len(self.dataset) + self.batch_size - 1) // self.batch_size
 
 
 def collate_fn(batch):
+    """Pads a batch of variable-length sequences to the same length."""
     src_list, trg_list = zip(*batch)
     src_padded = pad_sequence(src_list, batch_first=True, padding_value=PAD_IDX)
     trg_padded = pad_sequence(trg_list, batch_first=True, padding_value=PAD_IDX)
@@ -706,15 +636,13 @@ def get_dataloader(
     token_type="word",
     num_workers=None,
 ):
+    """Builds a DataLoader (bucketed if shuffling, else sequential) for a preprocessed CSV split."""
     if num_workers is None:
         configured = load_config().get("data", {}).get("num_workers")
         if configured is not None:
             num_workers = int(configured)
         else:
-            # Leave a core free for the main process/OS; cap the upper end since
-            # returns diminish past a dozen or so workers for this dataset's light
-            # per-batch collation cost. Override via data.num_workers in config.yaml
-            # if a specific machine benefits from going higher/lower.
+            # leave a core free for the main process/OS
             num_workers = max(1, min((os.cpu_count() or 4) - 1, 12))
 
     dataset = PretokenizedNMTDataset(
@@ -755,12 +683,11 @@ def get_dataloader(
 
     return loader, dataset.src_vocab, dataset.trg_vocab
 
-# =============================================================================
 # Pretrained embedding loading: GloVe / word2vec-style (embeddings.py)
-# =============================================================================
 
 
 def _get_cache_dir():
+    """Returns (and creates) the folder used to cache parsed embedding files."""
     cache_dir = os.path.join("data", ".embeddings_cache")
     os.makedirs(cache_dir, exist_ok=True)
     return cache_dir
@@ -833,9 +760,7 @@ def load_word2vec_keyed_vectors(filepath, binary=False):
 
 
 def _load_headerless_vector_dict(filepath, emb_dim=300):
-    """Parses classic GloVe .txt format (no leading '<vocab> <dim>' header line,
-    unlike word2vec/fastText .vec files), with the same .pt disk cache as
-    load_word2vec_keyed_vectors so re-runs don't re-parse the multi-GB file."""
+    """Parses a headerless GloVe .txt vector file, with the same disk cache as load_word2vec_keyed_vectors."""
     cache_dir = _get_cache_dir()
     base_name = os.path.basename(filepath).replace(".", "_")
     pt_cache_path = os.path.join(cache_dir, f"cache_{base_name}.pt")
@@ -905,7 +830,7 @@ def populate_embedding_matrix(vocab, vector_dict, emb_dim=300, token_type="word"
                 break
 
         if matched_vec is not None:
-            # Adjust vector length to match requested emb_dim (truncation/padding)
+            # truncate or pad the vector to the requested emb_dim
             vec_len = len(matched_vec)
             if vec_len > emb_dim:
                 matched_vec = matched_vec[:emb_dim]
@@ -920,23 +845,6 @@ def populate_embedding_matrix(vocab, vector_dict, emb_dim=300, token_type="word"
     print(f"✅ Loaded {found}/{total_eval} tokens ({coverage:.1f}%) from pre-trained vectors.")
     return weights
 
-
-# Per-language pretrained vector files. English has genuine Word2Vec (GoogleNews,
-# 300d) and GloVe (Stanford glove.6B, 300d) releases. German/Swedish have no
-# public GloVe release, and no public release of the ORIGINAL GoogleNews-style
-# Word2Vec either - so both embedding_source options fall back to the best real
-# Word2Vec models available for those languages instead: German from devmount's
-# GermanWordEmbeddings (gensim word2vec .bin, 300d, German Wikipedia + news
-# corpus, MIT license - https://devmount.github.io/GermanWordEmbeddings/) and
-# Swedish from the NLPL Word Vectors Repository (word2vec Continuous Skipgram,
-# 100d, Swedish CoNLL17 corpus - http://vectors.nlpl.eu/repository/, model id
-# 69). Note the Swedish model is only 100d vs 300d for English/German -
-# populate_embedding_matrix() zero-pads it out to whatever emb_dim is requested,
-# which is a minor real limitation worth naming in the report, not a bug.
-# This means "word2vec" and "glove" are IDENTICAL on the German/Swedish side
-# (no separate real GloVe exists there) and only differ on the English side of
-# a pair; report this explicitly rather than presenting it as a full ablation on
-# the non-English side.
 _WORD2VEC_FILES = {
     "en": ("GoogleNews-vectors-negative300.bin", True),
     "de": ("german.word2vec.bin", True),
@@ -959,12 +867,7 @@ def generate_word2vec_embeddings(
     token_type="word",
     data_dir="data",
 ):
-    """Loads pretrained Word2Vec-family embeddings for a given language vocabulary.
-
-    Language-correct: English uses real GoogleNews Word2Vec vectors; German/Swedish
-    use fastText Wikipedia vectors (no public German/Swedish Word2Vec release exists
-    here) instead of silently reusing the English file.
-    """
+    """Loads pretrained Word2Vec embeddings for a vocabulary (language-specific file per lang)."""
     if token_type == "char":
         if not silent:
             print("⚠️ Token level is 'char'. Skipping Word2Vec loading.")
@@ -989,7 +892,6 @@ def generate_word2vec_embeddings(
         return None
 
 
-# Alias expected by preprocess.py
 def precompute_word2vec_embeddings(
     vocab,
     train_csv=None,
@@ -999,6 +901,7 @@ def precompute_word2vec_embeddings(
     pair_prefix=None,
     token_type="word",
 ):
+    """Alias for generate_word2vec_embeddings (name expected by preprocess.py)."""
     return generate_word2vec_embeddings(
         vocab=vocab,
         train_csv=train_csv,
@@ -1011,13 +914,7 @@ def precompute_word2vec_embeddings(
 
 
 def _load_pretrained_vector_dict(lang, source, emb_dim, data_dir, silent):
-    """Resolves and loads the language-correct pretrained vector dict for
-    embedding_source in {'glove', 'word2vec'}. English uses the real GloVe/
-    Word2Vec release; German uses devmount's German Word2Vec, Swedish uses the
-    NLPL Swedish Word2Vec (see _WORD2VEC_FILES/_GLOVE_FILES above) since no
-    public German/Swedish GloVe release exists - using the English file for
-    those languages (the original behavior) would silently score near-zero
-    real coverage."""
+    """Loads the correct pretrained vector file for a given language and source ('glove' or 'word2vec')."""
     files = _GLOVE_FILES if source == "glove" else _WORD2VEC_FILES
     filename, mode = files.get(lang, files["en"])
     filepath = os.path.join(data_dir, filename)
@@ -1041,9 +938,7 @@ def load_glove_embeddings(
     glove_dir="data",
     lang="en",
 ):
-    """Loads pretrained embeddings for a single vocabulary under the 'glove'
-    embedding_source condition, using the language-correct file (see
-    _load_pretrained_vector_dict)."""
+    """Loads pretrained GloVe embeddings for a single vocabulary."""
     if token_type == "char":
         if not silent:
             print("⚠️ Token level is 'char'. Skipping GloVe loading.")
@@ -1079,10 +974,7 @@ def load_glove_embeddings_pair(
     silent=False,
     token_type="word",
 ):
-    """Loads pretrained 'glove'-condition embeddings for a source/target vocab
-    pair, resolving each side to its own language-correct file (see
-    _load_pretrained_vector_dict) instead of applying one language's vectors
-    to both vocabularies."""
+    """Loads pretrained GloVe embeddings for a source/target vocab pair, one file per language."""
     if token_type == "char":
         if not silent:
             print("⚠️ Token level is 'char'. Skipping GloVe loading.")
@@ -1112,13 +1004,12 @@ def load_glove_embeddings_pair(
             print(f"⚠️ Failed to load GloVe embeddings: {e}")
         return None, None
 
-# =============================================================================
 # Encoder / Decoder (Luong & Bahdanau attention) / Seq2Seq (models.py)
-# =============================================================================
 
 
 
 class Encoder(nn.Module):
+    """RNN encoder: embeds the source sequence and runs it through an RNN/GRU/LSTM."""
     def __init__(
         self,
         vocab_size,
@@ -1132,6 +1023,7 @@ class Encoder(nn.Module):
         freeze_emb=False,
         custom_emb_dim=None,
     ):
+        """Builds the embedding layer (optionally pretrained) and the RNN."""
         super().__init__()
         self.rnn_type = rnn_type
         emb_dim_in = custom_emb_dim if custom_emb_dim else emb_dim
@@ -1165,6 +1057,7 @@ class Encoder(nn.Module):
         )
 
     def forward(self, src):
+        """Runs the source sequence through the embedding and RNN."""
         embedded = self.dropout(self.embedding(src))
         if self.project is not None:
             embedded = self.project(embedded)
@@ -1174,11 +1067,13 @@ class Encoder(nn.Module):
 
 
 class LuongAttention(nn.Module):
+    """Multiplicative (Luong-style) attention over encoder outputs."""
     def __init__(self, hidden_dim, enc_hidden_dim):
         super().__init__()
         self.attn = nn.Linear(hidden_dim, enc_hidden_dim)
 
     def forward(self, hidden, encoder_outputs):
+        """Returns attention weights over encoder outputs for the current decoder state."""
         score = torch.bmm(
             encoder_outputs, self.attn(hidden).unsqueeze(2)
         ).squeeze(2)
@@ -1186,6 +1081,7 @@ class LuongAttention(nn.Module):
 
 
 class BahdanauAttention(nn.Module):
+    """Additive (Bahdanau-style) attention over encoder outputs."""
     def __init__(self, hidden_dim, enc_hidden_dim):
         super().__init__()
         self.W_a = nn.Linear(hidden_dim, hidden_dim)
@@ -1193,6 +1089,7 @@ class BahdanauAttention(nn.Module):
         self.v_a = nn.Linear(hidden_dim, 1, bias=False)
 
     def forward(self, hidden, encoder_outputs, proj_enc_outputs=None):
+        """Returns attention weights over encoder outputs for the current decoder state."""
         if proj_enc_outputs is None:
             proj_enc_outputs = self.U_a(encoder_outputs)
 
@@ -1202,6 +1099,7 @@ class BahdanauAttention(nn.Module):
 
 
 class Decoder(nn.Module):
+    """RNN decoder with optional Luong/Bahdanau attention, one token at a time."""
     def __init__(
         self,
         vocab_size,
@@ -1216,6 +1114,7 @@ class Decoder(nn.Module):
         freeze_emb=False,
         custom_emb_dim=None,
     ):
+        """Builds the embedding, optional attention module, RNN, and output projection."""
         super().__init__()
         self.vocab_size = vocab_size
         self.attention_type = attention_type
@@ -1268,6 +1167,7 @@ class Decoder(nn.Module):
         self.fc_out = nn.Linear(fc_in_dim, vocab_size)
 
     def forward_step(self, input_token, hidden, encoder_outputs, proj_enc_outputs=None):
+        """Decodes a single output token given the previous token and hidden state."""
         embedded = self.dropout(self.embedding(input_token.unsqueeze(1)))
         if self.project is not None:
             embedded = self.project(embedded)
@@ -1303,6 +1203,7 @@ class Decoder(nn.Module):
     def forward(
         self, trg, hidden, encoder_outputs, teacher_forcing_ratio=0.4
     ):
+        """Decodes the full target sequence, using teacher forcing during training."""
         batch_size, trg_len = trg.shape
 
         proj_enc = (
@@ -1311,7 +1212,6 @@ class Decoder(nn.Module):
             else None
         )
 
-        # Fully traceable teacher-forcing check for non-attention mode
         use_teacher_forcing = self.training and (
             (torch.rand(1, device=trg.device).item() < teacher_forcing_ratio)
             if teacher_forcing_ratio > 0.0
@@ -1332,13 +1232,11 @@ class Decoder(nn.Module):
             )
             return torch.cat([zero_step, predictions], dim=1)
 
-        # Pre-allocate output tensor directly in VRAM
         outputs = torch.zeros(
             batch_size, trg_len, self.vocab_size, device=trg.device, dtype=encoder_outputs.dtype
         )
         input_token = trg[:, 0]
 
-        # Generate teacher-forcing mask as a GPU boolean Tensor (1D)
         if self.training and teacher_forcing_ratio > 0.0:
             use_tf_steps = torch.rand(trg_len - 1, device=trg.device) < teacher_forcing_ratio
         else:
@@ -1350,18 +1248,17 @@ class Decoder(nn.Module):
             )
             outputs[:, t] = pred
             next_tf = trg[:, t]
-
-            # Vectorized selection via torch.where (Traceable by torch.compile)
             input_token = torch.where(use_tf_steps[t - 1], next_tf, pred.argmax(dim=1))
 
         return outputs
 
 class Seq2Seq(nn.Module):
+    """Wraps an Encoder and Decoder into one translation model."""
     def __init__(self, encoder, decoder, device=None):
+        """Stores the encoder/decoder and sets up a bridge layer if their hidden sizes differ."""
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
-        # Device attribute removed; retrieve dynamically from parameters when needed
 
         if encoder.rnn.bidirectional:
             enc_hidden_dim = encoder.rnn.hidden_size * 2
@@ -1381,6 +1278,7 @@ class Seq2Seq(nn.Module):
             self.bridge_c = None
 
     def _bridge_hidden(self, hidden):
+        """Projects the encoder's (bidirectional) final hidden state to the decoder's hidden size."""
         if not self.encoder.rnn.bidirectional or self.bridge_h is None:
             return hidden
 
@@ -1398,6 +1296,7 @@ class Seq2Seq(nn.Module):
             return torch.tanh(self.bridge_h(h_cat))
 
     def forward(self, src, trg, teacher_forcing_ratio=0.4):
+        """Encodes the source, then decodes the target sequence."""
         encoder_outputs, hidden = self.encoder(src)
         hidden = self._bridge_hidden(hidden)
         outputs = self.decoder(
@@ -1405,9 +1304,7 @@ class Seq2Seq(nn.Module):
         )
         return outputs
 
-# =============================================================================
 # Corpus download, cleaning, sampling, train/val/test splitting (preprocess.py)
-# =============================================================================
 
 
 
@@ -1584,6 +1481,7 @@ def preprocess_data(
     max_word_len=64,
     max_char_len=256,
 ):
+    """Cleans, lowercases, deduplicates, and length-filters a raw sentence-pair DataFrame."""
     df = df.copy()
 
     try:
@@ -1621,6 +1519,7 @@ def preprocess_data(
     df = df.drop_duplicates()
 
     def get_word_len(series):
+        """Counts words per row via space count + 1."""
         return series.str.count(" ") + 1
 
     if token_type == "char":
@@ -1677,6 +1576,7 @@ def process_and_save_pair(
 
 
 def _cache_single_pair(src, trg, processed_dir, token_type):
+    """Pre-tokenizes one language pair's CSV splits and caches binary tensors + embedding matrices."""
     pair_tag = f"{src}_{trg}"
     train_csv = get_split_path(processed_dir, "train", src, trg)
     val_csv = get_split_path(processed_dir, "val", src, trg)
@@ -1709,13 +1609,6 @@ def _cache_single_pair(src, trg, processed_dir, token_type):
                 trg_vocab=train_ds.trg_vocab,
             )
 
-        # Precompute and disk-cache resulting embedding matrices.
-        # NOTE: this precomputes matrices from the huge pretrained wiki.*.vec /
-        # GoogleNews.bin files, which train.py currently does NOT consume (it has
-        # its own separate on-the-fly Word2Vec generator - see train.py's local
-        # generate_word2vec_embeddings). Loading those multi-GB files via gensim
-        # takes 10+ minutes and several GB of RAM regardless of dataset size, so
-        # this is opt-in only (config: data.precompute_word2vec_cache: true).
         precompute_enabled = load_config().get("data", {}).get("precompute_word2vec_cache", False)
         if token_type in ["word", "both"] and precompute_enabled:
             matrix_cache_dir = os.path.join(processed_dir, ".matrix_cache")
@@ -1743,10 +1636,7 @@ def _cache_single_pair(src, trg, processed_dir, token_type):
 
 
 def execute_offline_caching(processed_dir, token_type="word"):
-    """
-    Pre-tokenizes CSV splits and caches binary tensors (.pt matrix files)
-    and pre-computed Word2Vec embedding weights locally.
-    """
+    """Pre-tokenizes and caches binary tensors + embeddings for all 3 language pairs."""
     print("\n" + "─" * 75)
     print("⚡ [OFFLINE BINARY CACHING & TENSOR PRE-SERIALIZATION]")
     print("─" * 75)
@@ -1758,6 +1648,7 @@ def execute_offline_caching(processed_dir, token_type="word"):
 
 
 def preprocess_main():
+    """CLI entry point: downloads, cleans, splits, and caches all 3 language pairs."""
     parser = argparse.ArgumentParser(
         description="NMT Pipeline Preprocessing Stage"
     )
@@ -1785,7 +1676,7 @@ def preprocess_main():
     os.makedirs(raw_dir, exist_ok=True)
     os.makedirs(processed_dir, exist_ok=True)
 
-    # Fast short-circuit: Skip downloading and string regex parsing if CSV splits exist
+    # skip re-downloading/cleaning if splits already exist
     if not args.mock and splits_already_exist(processed_dir):
         print("✓ Processed dataset CSV splits already exist locally. Skipping raw text cleaning.")
         execute_offline_caching(processed_dir, token_type=args.token_type)
@@ -1904,9 +1795,7 @@ def preprocess_main():
 
 
 
-# =============================================================================
 # Inference, BLEU/METEOR scoring, reporting (evaluate.py)
-# =============================================================================
 
 try:
     from nltk.translate.meteor_score import meteor_score
@@ -1921,9 +1810,7 @@ except LookupError:
     nltk.download('wordnet', quiet=True)
 
 
-# ------------------------------------------------------------------------
 # Helper Utilities & Inference
-# ------------------------------------------------------------------------
 
 def idx_to_tokens(indices, vocab):
     """Converts token indices back to readable string tokens."""
@@ -1981,7 +1868,6 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
     """Translates a source sequence and captures target output and attention matrix."""
     model.eval()
 
-    # Numericalize source
     if hasattr(src_vocab, 'stoi'):
         src_indices = [SOS_IDX] + [src_vocab.stoi.get(tok, UNK_IDX) for tok in src_tokens] + [EOS_IDX]
     elif hasattr(src_vocab, '__getitem__'):
@@ -1993,16 +1879,13 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
 
     with torch.no_grad():
         encoder_outputs, hidden = model.encoder(src_tensor)
-        # Bidirectional encoder hidden states must be bridged into the decoder's
-        # expected shape before decoding - Seq2Seq.forward() does this internally,
-        # but calling model.encoder(...) directly here bypasses that step.
+        # bridge the encoder's hidden state (Seq2Seq.forward normally does this)
         hidden = model._bridge_hidden(hidden)
 
         trg_indexes = [SOS_IDX]
         attentions = []
 
-        # Pre-compute Bahdanau's encoder projection once (forward_step would otherwise
-        # recompute it on every single decoding step).
+        # precompute Bahdanau's encoder projection once instead of per step
         proj_enc = (
             model.decoder.attention.U_a(encoder_outputs)
             if getattr(model.decoder, 'attention_type', None) == 'bahdanau'
@@ -2011,9 +1894,7 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
 
         for _ in range(max_len):
             trg_tensor = torch.LongTensor([trg_indexes[-1]]).to(device)
-            # Decoder.forward() expects a full [batch, seq_len] teacher-forced target
-            # sequence (used during training); single-token greedy decoding must go
-            # through forward_step() instead.
+            # greedy decoding uses forward_step() one token at a time
             output, hidden, attn = model.decoder.forward_step(
                 trg_tensor, hidden, encoder_outputs, proj_enc_outputs=proj_enc
             )
@@ -2028,10 +1909,6 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
                 break
 
     translated_tokens = idx_to_tokens(trg_indexes[1:], trg_vocab)
-    # NOTE: dataset.py's EOS token is stored as "<EOS>" (uppercase) - this
-    # comparison never matches, so the trailing EOS token is never actually
-    # stripped here. See the module docstring above for the measured impact
-    # and why this has intentionally been left unfixed.
     if translated_tokens and translated_tokens[-1] == "<eos>":
         translated_tokens = translated_tokens[:-1]
 
@@ -2039,9 +1916,7 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
     return translated_tokens, attn_matrix
 
 
-# ------------------------------------------------------------------------
 # Primary Required Functions
-# ------------------------------------------------------------------------
 
 def visualize_attention(model_path, src_sentence=None, save_path=None, device=None):
     """Generates and saves an attention heatmap for a sample input sentence."""
@@ -2113,12 +1988,7 @@ def generate_all_reports(token_type="word", output_dir=None):
             if token_type and data.get("token_type", "word") != token_type:
                 continue
 
-            # Skip stage-level bookkeeping files (e.g. best_config_TUNE_CHAR_
-            # COARSE.json, written by run_studies.py's execute_tuning() to
-            # record which hyperparameters won a tuning stage) - they have no
-            # "experiment" key at all (real per-experiment files always do,
-            # via vars(args) in train.py), so they'd otherwise show up as a
-            # garbage "N/A" row full of NaN in the aggregated report.
+            # skip tuning-stage bookkeeping files, which have no "experiment" key
             if not data.get("experiment"):
                 continue
 
@@ -2162,11 +2032,10 @@ def generate_all_reports(token_type="word", output_dir=None):
     return df
 
 
-# ------------------------------------------------------------------------
 # Evaluation Pipeline
-# ------------------------------------------------------------------------
 
 def _bucket_for_length(n):
+    """Buckets a sentence length into a Short/Medium/Long/Very Long label."""
     if n <= 10:
         return "Short (1-10 tokens)"
     elif n <= 20:
@@ -2177,16 +2046,13 @@ def _bucket_for_length(n):
 
 
 def _config_json_path_for_checkpoint(checkpoint_path):
+    """Returns the config JSON path matching a given model checkpoint path."""
     base = os.path.basename(checkpoint_path).replace("best_model_", "best_config_").replace(".pt", ".json")
     return os.path.join(os.path.dirname(checkpoint_path), base)
 
 
 def evaluate_checkpoint(checkpoint_path, max_samples=1000, device=None):
-    """Evaluates BLEU and METEOR metrics for a saved checkpoint on the held-out TEST set
-    (not validation - validation is for model selection during training, the PDF asks for
-    results on the 20 percent test split). Also buckets results by source sentence length
-    (Short/Medium/Long/Very Long) to answer whether sentence length impacts translation
-    quality, and persists the bucket breakdown directly into the checkpoint's config JSON."""
+    """Computes BLEU/METEOR on the held-out test set and buckets results by sentence length."""
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -2301,11 +2167,10 @@ def evaluate_checkpoint(checkpoint_path, max_samples=1000, device=None):
     return bleu, mean_meteor, bucket_analysis
 
 
-# ------------------------------------------------------------------------
 # CLI Entry Point
-# ------------------------------------------------------------------------
 
 def evaluate_main():
+    """CLI entry point: evaluate a checkpoint, visualize attention, or build a report."""
     parser = argparse.ArgumentParser(description="Evaluation and Reporting Interface")
     parser.add_argument("mode", choices=["evaluate", "report", "visualize"], nargs="?", default="report")
     parser.add_argument("--checkpoint", type=str, default=None, help="Path to model checkpoint")
@@ -2331,9 +2196,7 @@ def evaluate_main():
 
 
 
-# =============================================================================
 # DE->EN->SV zero-shot pivot chain (pivot.py)
-# =============================================================================
 
 try:
     from nltk.translate.meteor_score import meteor_score
@@ -2342,7 +2205,9 @@ except ImportError:
 
 
 class PivotTranslator:
+    """Chains a DE->EN model and an EN->SV model to translate DE->SV without direct training data."""
     def __init__(self, de_en_path, en_sv_path, device, token_type="word"):
+        """Loads both leg models from their checkpoints."""
         self.device = device
         self.token_type = token_type
         print("Loading DE -> EN Model Layout...")
@@ -2356,6 +2221,7 @@ class PivotTranslator:
         del en_sv_checkpoint
 
     def _reconstruct_model(self, checkpoint):
+        """Rebuilds a Seq2Seq model from a checkpoint's config and weights."""
         config = checkpoint['config']
         src_vocab = checkpoint['src_vocab']
         trg_vocab = checkpoint['trg_vocab']
@@ -2385,31 +2251,29 @@ class PivotTranslator:
 
         model = Seq2Seq(enc, dec, self.device).to(self.device)
         model.load_state_dict(checkpoint['model_state_dict'])
-        model.eval()  # Freeze layers and enable optimized cuDNN inference paths
+        model.eval()
         return model, src_vocab, trg_vocab
 
     def _tokenize(self, text):
+        """Splits text into characters or words, depending on token_type."""
         text = str(text).strip()
         return list(text) if self.token_type == "char" else text.split()
 
     def _join(self, tokens):
+        """Joins tokens back into a string."""
         return "".join(tokens) if self.token_type == "char" else " ".join(tokens)
 
     def translate(self, de_sentence):
+        """Translates DE -> SV via the intermediate EN hop."""
         src_tokens = self._tokenize(de_sentence)
 
         with torch.no_grad():
-            # Stage 1: DE -> EN, using the DE-EN model's own vocab pair.
             en_tokens, _ = translate_sentence(
                 self.de_en_model, src_tokens, self.de_en_src_vocab, self.de_en_trg_vocab, self.device
             )
             en_sentence = self._join(en_tokens)
 
-            # Stage 2: EN -> SV. Critically, re-tokenize/numericalize against the EN-SV
-            # model's OWN source vocab (en_sv_src_vocab), not the DE-EN model's target
-            # vocab (de_en_trg_vocab) - the two were built independently from different
-            # training runs, so their word->index mappings don't line up even though
-            # both are "English".
+            # re-tokenize against the EN-SV model's own vocab, not the DE-EN model's
             en_tokens_for_sv = self._tokenize(en_sentence)
             sv_tokens, _ = translate_sentence(
                 self.en_sv_model, en_tokens_for_sv, self.en_sv_src_vocab, self.en_sv_trg_vocab, self.device
@@ -2419,19 +2283,7 @@ class PivotTranslator:
         return sv_sentence, en_sentence, en_tokens, sv_tokens
 
     def translate_with_attention(self, de_sentence):
-        """Same two-hop translation as translate(), but also keeps both legs'
-        attention matrices for visualization (Task 5). Kept as a separate
-        method rather than changing translate()'s return signature, since
-        translate() is the one used by the quantitative BLEU/METEOR
-        evaluation loop and callers there don't need the extra data.
-
-        Returns a dict with everything a report figure needs for both hops:
-        tokens (with <sos>/<eos>) and the attention matrix for DE->EN, then
-        for EN->SV - where the EN->SV *source* is the DE->EN model's own
-        (possibly imperfect) output, not the gold English reference. That
-        propagated-error property is the whole point of a pivot chain and is
-        exactly what the visualization should make visible.
-        """
+        """Same as translate(), but also returns both legs' attention matrices for visualization."""
         src_tokens = self._tokenize(de_sentence)
 
         with torch.no_grad():
@@ -2466,11 +2318,7 @@ class PivotTranslator:
 
 
 def run_quantitative_evaluation(translator, token_type, experiment, max_samples=None):
-    """Runs the DE->EN->SV pivot chain over the aligned pivot evaluation set
-    (built by build_pivot_eval_set.py from real Europarl data, not synthetic
-    references) and reports corpus BLEU/METEOR for both the final SV output
-    and the intermediate EN pivot stage, so the report can show where quality
-    is lost across the two-stage chain."""
+    """Runs the DE->EN->SV pivot chain over the eval set and reports BLEU/METEOR for both hops."""
     import pandas as pd
 
     eval_csv = os.path.join(ROOT_DIR, "data", "processed", "pivot_de_en_sv_eval.csv")
@@ -2542,6 +2390,7 @@ def run_quantitative_evaluation(translator, token_type, experiment, max_samples=
 
 
 def pivot_main():
+    """CLI entry point: translate a sentence or run quantitative pivot evaluation."""
     parser = argparse.ArgumentParser(description="Zero-Shot German to Swedish via English Pivot")
     parser.add_argument("--de_en_model", type=str, required=True)
     parser.add_argument("--en_sv_model", type=str, required=True)
@@ -2564,9 +2413,7 @@ def pivot_main():
     if args.evaluate:
         run_quantitative_evaluation(translator, args.token_type, args.experiment, max_samples=args.max_samples)
 
-# =============================================================================
 # Builds the aligned DE/EN/SV pivot evaluation set (build_pivot_eval_set.py)
-# =============================================================================
 
 PIVOT_EVAL_SET_SIZE = 3000
 PIVOT_EVAL_SEED = 42
@@ -2575,11 +2422,13 @@ PIVOT_PROCESSED_DIR = os.path.join(ROOT_DIR, "data", "processed")
 
 
 def read_lines(path):
+    """Reads a text file into a list of stripped lines."""
     with codecs.open(path, "r", encoding="utf-8", errors="replace") as f:
         return [l.strip() for l in f]
 
 
 def build_pivot_eval_main():
+    """CLI entry point: builds the aligned DE/EN/SV pivot evaluation CSV from raw corpora."""
     print("=" * 75)
     print("Building genuine DE -> SV pivot evaluation set (via shared English side)")
     print("=" * 75)
@@ -2601,9 +2450,7 @@ def build_pivot_eval_main():
     sv_lines = read_lines(sv_path)
     print(f"  DE-EN: {len(de_lines):,} lines | EN-SV: {len(en2_lines):,} lines")
 
-    # Clean each pair with the exact same rules used for training data
-    # (lowercase, strip empty, remove XML-tag lines), so the alignment key
-    # (the English text) is cleaned consistently on both sides.
+    # clean both pairs the same way training data is cleaned
     de_en_df = pd.DataFrame({"de": de_lines, "en": en1_lines})
     de_en_clean = preprocess_data(de_en_df, src_col="de", trg_col="en", token_type="word")
 
@@ -2612,7 +2459,7 @@ def build_pivot_eval_main():
 
     print(f"  After cleaning: DE-EN {len(de_en_clean):,} rows | EN-SV {len(en_sv_clean):,} rows")
 
-    # Deduplicate by English text (first occurrence wins) to build the join key.
+    # dedupe by English text to build the join key
     de_en_map = dict(zip(de_en_clean["en"], de_en_clean["de"]))
     en_sv_map = dict(zip(en_sv_clean["en"], en_sv_clean["sv"]))
 
@@ -2639,13 +2486,13 @@ def build_pivot_eval_main():
 
 
 
-# =============================================================================
 # Single-experiment training entry point, DDP-aware (train.py)
-# =============================================================================
 
 
 class DistributedBatchSamplerWrapper(Sampler):
+    """Splits a BucketBatchSampler's batches across DDP ranks, one shard of batches per process."""
     def __init__(self, batch_sampler, num_replicas, rank, shuffle=True):
+        """Stores the underlying sampler and this process's rank/world size."""
         self.batch_sampler = batch_sampler
         self.num_replicas = num_replicas
         self.rank = rank
@@ -2653,33 +2500,37 @@ class DistributedBatchSamplerWrapper(Sampler):
         self.epoch = 0
 
     def set_epoch(self, epoch):
+        """Sets the epoch used to seed shuffling (must match across all ranks)."""
         self.epoch = epoch
         if hasattr(self.batch_sampler, 'set_epoch'):
             self.batch_sampler.set_epoch(epoch)
 
     def __iter__(self):
-        # Seed MUST be identical across all ranks so every process shuffles the list identically!
+        """Yields this rank's shard of batches (seed matched across ranks so shuffling agrees)."""
         rng = random.Random(self.epoch + 42)
         batches = list(self.batch_sampler)
         if self.shuffle:
             rng.shuffle(batches)
-            
+
         if len(batches) % self.num_replicas != 0:
             padding_size = self.num_replicas - (len(batches) % self.num_replicas)
             batches += batches[:padding_size]
-            
+
         for i in range(self.rank, len(batches), self.num_replicas):
             yield batches[i]
 
     def __len__(self):
+        """Returns this rank's share of the total batch count."""
         import math
         return math.ceil(len(self.batch_sampler) / self.num_replicas)
 
 def str2bool(v):
+    """Parses common truthy/falsy strings into a bool (for argparse)."""
     if isinstance(v, bool): return v
     return v.lower() in ('yes', 'true', 't', 'y', '1')
 
 def parse_args():
+    """Defines and parses the training script's CLI arguments."""
     parser = argparse.ArgumentParser(description="Unified Seq2Seq NMT Training Interface")
     parser.add_argument("--experiment", type=str, required=True)
     parser.add_argument("--rnn_type", type=str, default="LSTM", choices=["RNN", "LSTM", "GRU"])
@@ -2700,15 +2551,15 @@ def parse_args():
     parser.add_argument("--src_lang", type=str, default="de")
     parser.add_argument("--trg_lang", type=str, default="en")
     parser.add_argument("--resume", type=str2bool, default=True, help="Resume from existing checkpoint if present")
-    
-    # Subsampling Controls
-    parser.add_argument("--eval_max_samples", type=int, default=1000, 
+
+    parser.add_argument("--eval_max_samples", type=int, default=1000,
                         help="Max samples for backfill test evaluation script (default: 1000)")
-    parser.add_argument("--val_max_samples", type=int, default=None, 
+    parser.add_argument("--val_max_samples", type=int, default=None,
                         help="Max samples for per-epoch validation split (default: None for full val)")
     return parser.parse_args()
-    
+
 def train_epoch(model, dataloader, optimizer, criterion, clip, device, tf_ratio, scaler=None, grad_accum_steps=1):
+    """Trains one epoch, with mixed precision and gradient accumulation. Returns the mean loss."""
     model.train()
     epoch_loss = 0
     optimizer.zero_grad(set_to_none=True)
@@ -2721,7 +2572,6 @@ def train_epoch(model, dataloader, optimizer, criterion, clip, device, tf_ratio,
                 output = model(src, trg, teacher_forcing_ratio=tf_ratio)
                 output_dim = output.shape[-1]
                 
-                # Check whether output includes prediction for <sos> or aligns dynamically
                 if output.shape[1] == trg.shape[1]:
                     output = output[:, :-1].reshape(-1, output_dim)
                 else:
@@ -2742,7 +2592,6 @@ def train_epoch(model, dataloader, optimizer, criterion, clip, device, tf_ratio,
             output = model(src, trg, teacher_forcing_ratio=tf_ratio)
             output_dim = output.shape[-1]
             
-            # Check whether output includes prediction for <sos> or aligns dynamically
             if output.shape[1] == trg.shape[1]:
                 output = output[:, :-1].reshape(-1, output_dim)
             else:
@@ -2770,6 +2619,7 @@ def train_epoch(model, dataloader, optimizer, criterion, clip, device, tf_ratio,
     return total_loss
 
 def evaluate_validation(model, dataloader, criterion, device):
+    """Computes mean validation loss (no teacher forcing, no gradient updates)."""
     model.eval()
     epoch_loss = 0
     with torch.no_grad():
@@ -2810,8 +2660,10 @@ def evaluate_validation(model, dataloader, criterion, device):
     return total_loss
 
 def train_main():
+    """CLI entry point: trains one experiment end-to-end (DDP-aware) and saves the best checkpoint."""
     args = parse_args()
-    
+
+
     rank = int(os.environ.get("RANK", "0"))
     local_rank = int(os.environ.get("LOCAL_RANK", "0"))
     world_size = int(os.environ.get("WORLD_SIZE", "1"))
@@ -2913,11 +2765,7 @@ def train_main():
     pretrained_src_emb, pretrained_trg_emb = None, None
     silent_logging = rank > 0
     
-    # Language-correct pretrained loading (see embeddings.py): English has real
-    # GloVe/Word2Vec releases; German/Swedish fall back to fastText Wikipedia
-    # vectors since no public German/Swedish GloVe or Word2Vec release exists here
-    # - the source and target vocab are now resolved to DIFFERENT files by language
-    # instead of both being mapped against one (usually English-only) file.
+    # source and target vocab each resolve to their own language's embedding file
     data_dir = os.path.join(ROOT_DIR, "data")
     if args.embedding_source == "word2vec":
         pretrained_src_emb = generate_word2vec_embeddings(
@@ -2952,9 +2800,6 @@ def train_main():
     
     model = Seq2Seq(encoder, decoder, device).to(device)
 
-    # ------------------------------------------------------------------------
-    # Dynamic Calculation of Model Footprint and Runtime Batch Tensor Sizes
-    # ------------------------------------------------------------------------
     if rank == 0:
         total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         model_size_mb = (total_params * 4) / (1024 ** 2)
@@ -2998,11 +2843,7 @@ def train_main():
         else:
             model = nn.parallel.DistributedDataParallel(model, find_unused_parameters=True)
         
-    # Triton (torch.compile's default backend) hard-requires CUDA compute capability
-    # >= 7.0 - on older GPUs (e.g. Pascal GTX 10-series, CC 6.1) it doesn't warn and
-    # fall back, it raises GPUTooOldForTriton on the first forward pass, which is
-    # *after* this try/except has already exited. Gate on capability first instead
-    # of relying on the try/except to catch a failure it structurally cannot catch.
+    # torch.compile needs CUDA compute capability >= 7.0 (fails late otherwise on older GPUs)
     supports_compile = hasattr(torch, "compile") and (
         device.type == "cuda" and torch.cuda.get_device_capability(device)[0] >= 7
     )
@@ -3037,7 +2878,7 @@ def train_main():
         if hasattr(raw_model, "_orig_mod"):
             raw_model = raw_model._orig_mod
         
-        # Clean torch.compile (_orig_mod.) and DDP (module.) prefixes during state_dict restoration
+        # strip torch.compile/DDP wrapper prefixes from the state dict keys
         clean_state_dict = {
             k.replace("_orig_mod.", "").replace("module.", ""): v 
             for k, v in checkpoint['model_state_dict'].items()
@@ -3053,10 +2894,7 @@ def train_main():
     if start_epoch >= args.epochs:
         if rank == 0:
             print(f"📦 Checkpoint already fully trained ({start_epoch}/{args.epochs} epochs). Skipping epoch loop.")
-            # Close a narrow race: if a prior invocation crashed after its last
-            # epoch but before reaching the post-loop sync below, "completed"
-            # would never get set even though training genuinely finished -
-            # start_epoch >= args.epochs is proof enough on its own.
+            # mark completed in case a prior run crashed before setting it
             if os.path.exists(config_json_path):
                 try:
                     with open(config_json_path, 'r') as f:
@@ -3118,22 +2956,10 @@ def train_main():
                     with open(config_json_path, 'w') as f:
                         json.dump(config_dict, f, indent=4)
             elif rank == 0:
-                # No early stop: epoch budgets here (4-10) are already short, so a
-                # single noisy non-improving epoch (common before the loss curve
-                # settles, with no LR warmup/decay in play) shouldn't cost most of
-                # the run - and Study A-E compare configs head-to-head, so every
-                # config needs the SAME number of epochs for the comparison to be
-                # fair. Keep training the full budget; only the best-val-loss
-                # checkpoint above gets saved/used downstream.
+                # no early stopping - all configs in a study train the same epoch budget
                 print(f"↪️ No improvement this epoch (best remains {best_val_loss:.4f}). Continuing - training the full requested budget regardless.")
 
-                # Still refresh the lightweight metadata (loss_history/epochs_trained)
-                # every epoch, independent of whether the heavier checkpoint weights
-                # get saved. There's no real cost to writing a few KB of JSON each
-                # epoch, and leaving it stale until the next improvement (or full
-                # completion) makes best_config_*.json misleading for anyone
-                # inspecting a run live - it undercounts epochs_trained by however
-                # many non-improving epochs have run since the last improvement.
+                # keep loss_history/epochs_trained current even on non-improving epochs
                 if os.path.exists(config_json_path):
                     try:
                         with open(config_json_path, 'r') as f:
@@ -3145,19 +2971,8 @@ def train_main():
                     except Exception:
                         pass
 
-        # Sync the complete per-epoch history (including any epochs after the
-        # last improvement) into the saved config, so best_config_*.json reflects
-        # the whole run rather than stopping at the last checkpoint save. Also
-        # mark "completed": True here - this is the only place that means "the
-        # full requested epoch budget actually finished" (the save-on-improve
-        # block above fires after epoch 1 too, long before the run is done).
-        # is_cache_valid() in utils.py reads this flag to decide whether
-        # run_studies.py can skip an already-finished experiment on a restart
-        # after a crash - without it, every already-completed experiment gets
-        # needlessly relaunched and (for non-TUNE_ experiments) has its full
-        # test-set BLEU/METEOR re-evaluated from scratch every time the
-        # pipeline is re-run, even though train.py's own start_epoch check
-        # already protects the actual training work from being redone.
+        # mark completed=True only once the full epoch budget has actually finished -
+        # is_cache_valid() checks this to decide whether a restart can skip this experiment
         if rank == 0 and os.path.exists(config_json_path):
             try:
                 with open(config_json_path, 'r') as f:
@@ -3184,9 +2999,6 @@ def train_main():
                     "--max_samples", str(args.eval_max_samples)
                 ]
                 
-                # --------------------------------------------------------
-                # Measure Inference & Translation Time
-                # --------------------------------------------------------
                 start_eval_time = time.time()
                 result = subprocess.run(cmd, capture_output=True, text=True, check=True)
                 inference_duration = time.time() - start_eval_time
@@ -3240,20 +3052,12 @@ def train_main():
 
 
 
-# =============================================================================
 # Master orchestrator - all 5 ablation studies + tuning stages (run_studies.py)
-# =============================================================================
 
 
 
 def get_batch_size(study, token_type):
-    """Centralized handler for batch size configuration across studies and token levels.
-
-    Resolution order: per-token-type override (batch_size_word/batch_size_char) ->
-    generic override (batch_size) -> hardware-agnostic hardcoded default. This lets each
-    machine keep its own local config/config.yaml (e.g. smaller batches on 8GB cards)
-    without touching shared code that other machines rely on.
-    """
+    """Resolves batch size: per-token-type config override, then generic override, then default."""
     training_cfg = config.get("training", {})
 
     per_type_batch = training_cfg.get(f"batch_size_{token_type}")
@@ -3271,6 +3075,7 @@ class AsyncEvaluationQueue:
     """Offloads evaluation and ledger synchronization to background execution threads."""
 
     def __init__(self, max_workers=2):
+        """Sets up the background thread pool."""
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
         self.futures = []
 
@@ -3278,6 +3083,7 @@ class AsyncEvaluationQueue:
         """Queues evaluation in the background without holding a global lock during computation."""
 
         def _task():
+            """Runs the evaluation and syncs its result into the ledger."""
             print(
                 f"\n⚡ [Async Eval Started] -> {experiment_id} ({rnn_type})"
             )
@@ -3306,6 +3112,7 @@ class AsyncEvaluationQueue:
             )
 
     def shutdown(self):
+        """Waits for all queued evaluations to finish and stops the thread pool."""
         self.executor.shutdown(wait=True)
 
 
@@ -3713,6 +3520,7 @@ def get_best_empirical_settings(token_type):
         prefix = token_type.upper()
 
         def get_composite_score(node):
+            """Scores an experiment by BLEU+METEOR if available, else negative val loss."""
             metrics = node.get("metrics", {})
             bleu = float(
                 metrics.get("overall_corpus_bleu", node.get("bleu", 0.0))
@@ -3815,11 +3623,7 @@ def execute_preprocessing(token_type="word", mock_mode=False):
 def execute_tuning(
     stage="coarse", token_type="word", epochs=5, num_trials=12, configs_per_rnn=None
 ):
-    """
-    Executes hyperparameter tuning sweeps.
-    - stage="coarse": Sweeps evenly across RNN, GRU, and LSTM baseline models.
-    - stage="fine": Tests the winner model configuration from Study C over the specified hyperparameter grid.
-    """
+    """Runs a hyperparameter sweep: "coarse" across RNN/GRU/LSTM, "fine" on Study C's winning architecture."""
     print(
         "\n"
         + "═" * 75
@@ -3831,15 +3635,7 @@ def execute_tuning(
     lrs = [0.0001, 0.0003, 0.0005, 0.001]
     dropouts = [0.2, 0.3, 0.4]
     emb_dims = [128, 256, 512] if token_type == "word" else [32, 64, 128]
-    # hidden_dim=1024 is excluded for char specifically: on an 8GB GPU it
-    # doesn't fit at any batch size once combined with char-level sequences
-    # (up to 300 timesteps), bidirectional processing, and attention -
-    # confirmed empirically down to batch_size=1 (~10.1GB minimum, WSL2's
-    # GPU-memory-oversubscription-into-system-RAM makes this look like it
-    # "succeeds" instead of a hard OOM, but at <1 sequence/sec it's
-    # unusable thrashing, not real training). word is unaffected - its
-    # worst case (hidden_dim=1024, emb_dim=512) fits comfortably.
-    hidden_dims = [256, 512, 1024] if token_type == "word" else [256, 512]
+    hidden_dims = [256, 512, 1024]
 
     batch_size = get_batch_size("TUNE", token_type)
     results_csv = os.path.join(
@@ -3871,7 +3667,6 @@ def execute_tuning(
     selected_trials = []
 
     if stage == "fine":
-        # Retrieve winner model parameters from Study C
         winner_c = get_best_empirical_settings(token_type)
         winner_rnn = winner_c["rnn_type"]
         winner_attn = winner_c["attention_type"]
@@ -3891,7 +3686,6 @@ def execute_tuning(
         all_combos = list(itertools.product(lrs, dropouts, emb_dims, hidden_dims))
         random.shuffle(all_combos)
 
-        # Select target trials
         trial_combos = all_combos[:num_trials] if num_trials and num_trials < len(all_combos) else all_combos
         for lr, drop, emb_d, hid_d in trial_combos:
             selected_trials.append((lr, drop, emb_d, hid_d, winner_rnn, winner_attn, winner_bidi, winner_emb_src, winner_freeze))
@@ -3906,16 +3700,8 @@ def execute_tuning(
         else:
             trials_per_rnn = max(1, num_trials // len(rnn_types))
 
-        # Each cell type must see a genuine spread of hyperparameters, not just
-        # `trials_per_rnn` random draws from the full grid - with a large grid
-        # (4*3*3*3=108 combos here) a plain random sample can by chance repeat
-        # the same lr/dropout/emb_dim/hidden_dim across most of its picks, which
-        # would starve get_best_hyperparameters() of real signal for that cell
-        # type and degrade every downstream stage (A-E) that inherits it. Cycle
-        # each hyperparameter dimension independently through its own shuffled
-        # order so `trials_per_rnn` picks are guaranteed to cover
-        # min(trials_per_rnn, len(values)) distinct values per dimension.
         def _diverse_picks(values, n):
+            """Cycles through a shuffled list of values so n picks cover as many distinct values as possible."""
             order = list(values)
             random.shuffle(order)
             return [order[i % len(order)] for i in range(n)]
@@ -4060,14 +3846,6 @@ def execute_tuning(
 def run_automated_post_processing(token_type, rnn_type):
     """Executes evaluation aggregation, pivot evaluation, and attention heatmap generation."""
     env = os.environ.copy()
-
-    # NOTE: there used to be a call here to `evaluate.py evaluate --token_type
-    # {token_type}` (no --checkpoint) as a safety-net re-evaluation pass. The
-    # current evaluate.py CLI requires --checkpoint and exits immediately
-    # without one, so that call always failed silently (swallowed by a bare
-    # except) - pure overhead, never did anything. Removed; per-experiment
-    # auto-backfill during training (see train.py) already handles evaluation,
-    # and generate_all_reports() below aggregates everything that produced.
 
     de_en_model = os.path.join(
         OUTPUT_DIR, f"best_model_{token_type.upper()}_D2_{rnn_type}.pt"
@@ -4541,26 +4319,14 @@ def execute_study_e(
 
 
 def run_pipeline_for_token_type(target_token_type, args):
-    """Executes the full pipeline for a single target token type (word or char).
-
-    Epoch/trial budget is split between "search" stages (tuning - only need to rank
-    configs relative to each other, not reach good absolute quality) and "report"
-    stages (Studies A-E - these ARE the numbers that go in the report, so they get
-    more training depth). Fine-tuning specifically gets fewer trials than coarse:
-    it re-searches the identical lr/dropout/emb_dim/hidden_dim grid coarse tuning
-    already sampled, just restricted to Study C's single winning architecture
-    instead of three, so it needs less exploration, not more.
-    """
-    # Dynamic epoch schedule definitions
+    """Runs tuning + Studies A-E end-to-end for one token type (word or char)."""
     TUNE_1_EPOCHS = args.epochs if args.epochs is not None else 4
     TUNE_2_EPOCHS = args.epochs if args.epochs is not None else 5
     STUDY_A_EPOCHS = args.epochs if args.epochs is not None else 8
     STUDY_B_EPOCHS = args.epochs if args.epochs is not None else 8
-    # Study C's winner determines every downstream stage (fine-tuning, D, E) - a noisy
-    # pick here cascades, so it gets extra margin beyond A/B.
+    # Study C's winner drives fine-tuning and D/E, so it gets extra epochs
     STUDY_C_EPOCHS = args.epochs if args.epochs is not None else 10
-    # Study D/E are the final deliverable models AND D2 (DE->EN) + E1 (EN->SV) feed the
-    # pivot evaluation chain directly - undertraining here caps pivot quality too.
+    # D2/E1 also feed the pivot evaluation chain, so they need full training too
     STUDY_DE_EPOCHS = args.epochs if args.epochs is not None else 10
 
     print("\n" + "═" * 80)
@@ -4664,6 +4430,7 @@ def run_pipeline_for_token_type(target_token_type, args):
 
 
 def run_studies_main():
+    """CLI entry point: runs tuning + Studies A-E for word, char, or both."""
     setup_logging(log_filename="run_studies.log", log_dir=OUTPUT_DIR)
 
     parser = argparse.ArgumentParser(
@@ -4763,25 +4530,16 @@ def run_studies_main():
 
 
 
-# =============================================================================
 # Global config load + base seeding (was run_studies.py module-level init)
-# =============================================================================
 
 config = load_config(CONFIG_PATH)
 set_seed(config.get("system", {}).get("seed", 42))
 eval_lock = threading.Lock()
 
 
-# =============================================================================
 # Unified CLI dispatcher
-# =============================================================================
-# Each original script's own argparse setup is left completely untouched
-# (inside {preprocess,train,evaluate,pivot,build_pivot_eval,run_studies}_main)
-# - only the outer --task selector is new. parse_known_args() peels off just
-# --task and leaves everything else in sys.argv exactly as each sub-main's
-# own parser expects, so e.g. `--task train --experiment X --epochs 5` still
-# reaches train_main() as `--experiment X --epochs 5`.
 def main():
+    """Reads --task and dispatches to the matching sub-main, passing the rest of argv through untouched."""
     task_parser = argparse.ArgumentParser(add_help=False)
     task_parser.add_argument(
         "--task",
