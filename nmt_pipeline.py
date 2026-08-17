@@ -37,6 +37,9 @@ from sklearn.model_selection import train_test_split
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset, Sampler, Subset
 
+import urllib.request
+import urllib.error
+
 import nltk
 from nltk.translate.bleu_score import SmoothingFunction, corpus_bleu
 try:
@@ -3070,6 +3073,40 @@ def get_batch_size(study, token_type):
 
     return "256" if token_type == "char" else "128"
 
+class auto_shutdown: 
+    def stop_this_pod(delay_seconds=45):
+        """Stops the current pod. Prints a countdown first so a human watching the
+        log has a window to Ctrl+C the pipeline process if they want to cancel."""
+        api_key = os.environ.get("RUNPOD_API_KEY")
+        pod_id = os.environ.get("RUNPOD_POD_ID")
+
+        if not api_key or not pod_id:
+            print("⚠️  Auto-shutdown skipped: RUNPOD_API_KEY or RUNPOD_POD_ID not set "
+                "in the environment (not running on a RunPod pod?).")
+            return False
+
+        print(f"\n🛑 Pipeline complete. Stopping pod {pod_id} in {delay_seconds}s to save "
+            f"GPU cost (data on the network volume is unaffected - Ctrl+C now to cancel).")
+        for remaining in range(delay_seconds, 0, -5):
+            print(f"   ...{remaining}s")
+            time.sleep(5)
+
+        url = f"https://rest.runpod.io/v1/pods/{pod_id}/stop"
+        req = urllib.request.Request(url, method="POST", headers={
+            "Authorization": f"Bearer {api_key}",
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                body = resp.read().decode("utf-8", errors="replace")
+                print(f"✅ Stop request accepted (HTTP {resp.status}): {body}")
+                return True
+        except urllib.error.HTTPError as e:
+            print(f"⚠️  Stop request failed (HTTP {e.code}): {e.read().decode('utf-8', errors='replace')}")
+            return False
+        except Exception as e:
+            print(f"⚠️  Stop request failed: {e}")
+            return False
+
 
 class AsyncEvaluationQueue:
     """Offloads evaluation and ledger synchronization to background execution threads."""
@@ -4525,8 +4562,7 @@ def run_studies_main():
     print("═" * 80 + "\n")
 
     if args.auto_shutdown:
-        from auto_shutdown import stop_this_pod
-        stop_this_pod()
+        auto_shutdown.stop_this_pod()
 
 
 
