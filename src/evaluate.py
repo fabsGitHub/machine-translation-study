@@ -12,15 +12,7 @@ Inference and evaluation utilities, plus a small CLI (`evaluate` /
   one CSV/JSON summary table, used both as a human-readable pipeline summary
   and by run_studies.py's own reporting stage.
 
-Known limitation (left as-is deliberately, not a bug to fix silently): the
-end-of-sequence trim in `translate_sentence` below checks for a lowercase
-"<eos>" string, while dataset.py's vocabulary stores the literal uppercase
-token "<EOS>" - the check never matches, so every hypothesis this module
-scores keeps a trailing "<EOS>" that has no counterpart in the reference.
-Measured at ~2% relative BLEU/METEOR deflation, applied uniformly across
-every reported experiment in this project, so relative rankings between
-configs are unaffected. See the README's Limitations section for the full
-writeup and reasoning for not patching this mid-project.
+Decoded hypotheses have their generated EOS token removed before scoring. Existing reports were produced by earlier evaluation code and remain historical until regenerated from the original checkpoints.
 """
 import os
 import sys
@@ -163,13 +155,10 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
             if pred_token == EOS_IDX:
                 break
 
-    translated_tokens = idx_to_tokens(trg_indexes[1:], trg_vocab)
-    # NOTE: dataset.py's EOS token is stored as "<EOS>" (uppercase) - this
-    # comparison never matches, so the trailing EOS token is never actually
-    # stripped here. See the module docstring above for the measured impact
-    # and why this has intentionally been left unfixed.
-    if translated_tokens and translated_tokens[-1] == "<eos>":
-        translated_tokens = translated_tokens[:-1]
+    translated_indices = trg_indexes[1:]
+    if translated_indices and translated_indices[-1] == EOS_IDX:
+        translated_indices = translated_indices[:-1]
+    translated_tokens = idx_to_tokens(translated_indices, trg_vocab)
 
     attn_matrix = np.array(attentions) if len(attentions) > 0 else None
     return translated_tokens, attn_matrix
