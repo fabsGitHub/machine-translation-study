@@ -1911,9 +1911,10 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
             if pred_token == EOS_IDX:
                 break
 
-    translated_tokens = idx_to_tokens(trg_indexes[1:], trg_vocab)
-    if translated_tokens and translated_tokens[-1] == "<eos>":
-        translated_tokens = translated_tokens[:-1]
+    translated_indices = trg_indexes[1:]
+    if translated_indices and translated_indices[-1] == EOS_IDX:
+        translated_indices = translated_indices[:-1]
+    translated_tokens = idx_to_tokens(translated_indices, trg_vocab)
 
     attn_matrix = np.array(attentions) if len(attentions) > 0 else None
     return translated_tokens, attn_matrix
