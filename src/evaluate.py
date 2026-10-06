@@ -68,6 +68,13 @@ def idx_to_tokens(indices, vocab):
     return tokens
 
 
+def strip_terminal_eos(token_indices):
+    """Remove one generated EOS marker at the end of a decoded sequence."""
+    if token_indices and token_indices[-1] == EOS_IDX:
+        return token_indices[:-1]
+    return token_indices
+
+
 def build_model_from_checkpoint(checkpoint, device):
     """Reconstructs the Seq2Seq model architecture from checkpoint metadata."""
     cfg = checkpoint['config']
@@ -155,9 +162,7 @@ def translate_sentence(model, src_tokens, src_vocab, trg_vocab, device, max_len=
             if pred_token == EOS_IDX:
                 break
 
-    translated_indices = trg_indexes[1:]
-    if translated_indices and translated_indices[-1] == EOS_IDX:
-        translated_indices = translated_indices[:-1]
+    translated_indices = strip_terminal_eos(trg_indexes[1:])
     translated_tokens = idx_to_tokens(translated_indices, trg_vocab)
 
     attn_matrix = np.array(attentions) if len(attentions) > 0 else None
