@@ -1,9 +1,6 @@
-# Machine-local settings for this RunPod instance (RTX 3090, 24GB VRAM, Ampere,
-# ~27-core CPU quota, ~116GB RAM quota - nproc/free report the HOST's raw 256
-# cores/1TB RAM inside this container; the real cgroup-enforced quota, checked via
-# /sys/fs/cgroup/cpu.max and memory.max, is ~27 cores / ~116GB).
-# Not committed to git - machine-local, keeps this from clobbering the GTX1070's
-# own tuned values in config/config.yaml there.
+# Committed performance-tuned profile measured in a RunPod environment with an RTX 3090.
+# CPU and memory quotas differed from host totals; these batch and worker settings are
+# hardware-specific measurements, not universal defaults. Re-benchmark before reuse.
 #
 # batch_size_word=256: empirically validated via bench.py across BOTH the typical
 # config (hidden_dim=512, no attention: 1782 seq/s, 8.3GB) AND the worst-case
