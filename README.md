@@ -152,28 +152,15 @@ python src/evaluate.py visualize --checkpoint data/results/best_model_MY_RUN_LST
     --sentence "ein kleiner hund läuft ."
 ```
 
-## Known limitations
+## Known limitations and result provenance
 
-Documented rather than silently patched, since fixing either mid-project
-would have made already-reported numbers inconsistent with newly-reported
-ones:
+The evaluator now removes the generated end-of-sequence token from decoded hypotheses before scoring. The tracked CSV and JSON reports were produced before this correction and have not been regenerated. Treat those values as historical, pre-fix results; no corrected metric values are claimed in this change. Earlier project notes estimated that retaining EOS reduced BLEU/METEOR by about 2% relative. Re-run evaluation against the original checkpoints to produce post-fix scores. Checkpoints are not included in the repository.
 
-- **EOS-token trim never fires in `evaluate.py`'s `translate_sentence`**:
-  the vocabulary stores `"<EOS>"` (uppercase, see `dataset.py`) but the trim
-  checks for lowercase `"<eos>"`, so every scored hypothesis keeps a
-  trailing EOS token the reference doesn't have. Measured impact: ~2%
-  relative BLEU/METEOR deflation, applied identically to every experiment
-  in this project - relative rankings between configs are unaffected.
-- **Cosmetic-only display bug in `run_studies.py`'s Study D/E console
-  banner**: `print_study_model_and_batch_info` is called with a stale
-  `emb_dim` value (the previous study's winning architecture) rather than
-  the actually-tuned one the experiment trains with, so one printed line
-  can show the wrong embedding size while the model itself trains
-  correctly on the right one. A related *functional* bug (the same stale
-  value was, for a while, also passed as a duplicate `--emb_dim` CLI flag
-  and silently overrode the correct one) was found and fixed during
-  development - see git history / the char pipeline's Study D results for
-  before/after parameter counts.
+- **Study D/E console banner:** the printed summary can show a stale embedding size from the previous study. This affects the banner only; the run configuration is passed separately. A related stale CLI parameter was corrected during development, as documented in the existing results and commit history.
+
+## License
+
+No license file is currently included. Add a license before inviting others to reuse or redistribute this project.
 
 ## Development notes
 
