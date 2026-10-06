@@ -152,6 +152,17 @@ python src/evaluate.py visualize --checkpoint data/results/best_model_MY_RUN_LST
     --sentence "ein kleiner hund läuft ."
 ```
 
+## Automated checks
+
+GitHub Actions compiles the modular source and standalone pipeline, then runs a standard-library regression test for terminal EOS trimming in both evaluators:
+
+```bash
+python -m compileall -q src nmt_pipeline.py tests
+python -m unittest discover -s tests -v
+```
+
+These checks do not download data, train models, run GPU experiments, or regenerate the reported metrics. The tracked result tables remain historical until evaluation is rerun against the original checkpoints.
+
 ## Known limitations and result provenance
 
 The evaluator now removes the generated end-of-sequence token from decoded hypotheses before scoring. The tracked CSV and JSON reports were produced before this correction and have not been regenerated. Treat those values as historical, pre-fix results; no corrected metric values are claimed in this change. Earlier project notes estimated that retaining EOS reduced BLEU/METEOR by about 2% relative. Re-run evaluation against the original checkpoints to produce post-fix scores. Checkpoints are not included in the repository.
@@ -160,7 +171,7 @@ The evaluator now removes the generated end-of-sequence token from decoded hypot
 
 ## License
 
-No license file is currently included. Add a license before inviting others to reuse or redistribute this project.
+This project’s original source code is licensed under the MIT License; see [LICENSE](LICENSE). The Europarl corpus, pretrained embeddings, Python dependencies, and other third-party materials remain subject to their own licenses and terms.
 
 ## Development notes
 
